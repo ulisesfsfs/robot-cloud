@@ -1,0 +1,89 @@
+[
+  {
+    "id": "vision-tab",
+    "type": "tab",
+    "label": "Vision RaspiRobot",
+    "disabled": false,
+    "info": "Recibe por MQTT los resultados JSON de vision.py."
+  },
+  {
+    "id": "vision-broker",
+    "type": "mqtt-broker",
+    "name": "Broker MQTT del robot",
+    "broker": "CAMBIAR_IP_DE_LA_PI",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": ""
+  },
+  {
+    "id": "vision-mqtt-in",
+    "type": "mqtt in",
+    "z": "vision-tab",
+    "name": "Resultados de vision.py",
+    "topic": "robot/vision",
+    "qos": "0",
+    "datatype": "utf8",
+    "broker": "vision-broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 190,
+    "y": 120,
+    "wires": [
+      [
+        "vision-json"
+      ]
+    ]
+  },
+  {
+    "id": "vision-json",
+    "type": "json",
+    "z": "vision-tab",
+    "name": "Decodificar JSON",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 400,
+    "y": 120,
+    "wires": [
+      [
+        "vision-debug"
+      ]
+    ]
+  },
+  {
+    "id": "vision-debug",
+    "type": "debug",
+    "z": "vision-tab",
+    "name": "Deteccion recibida",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload.detectado",
+    "statusType": "msg",
+    "x": 610,
+    "y": 120,
+    "wires": []
+  }
+]
