@@ -4,7 +4,7 @@ Vision para el robot: lee el stream de IP Webcam, analiza cada cuadro con OpenCV
 y publica el resultado por MQTT (por defecto en el topico robot/vision).
 
 Ejemplos:
-  python vision.py --url http://IP_DEL_CELULAR:PUERTO/video --modo color --color verde --ver
+  python vision.py --url http://IP_DEL_CELULAR:PUERTO/video --modo color --color verde
   python vision.py --url http://IP_DEL_CELULAR:PUERTO/video --modo movimiento
   python vision.py --url http://IP_DEL_CELULAR:PUERTO/video --modo qr --sin-mqtt
 
@@ -105,8 +105,10 @@ def main():
                     help="puerto MQTT (o variable MQTT_PORT)")
     ap.add_argument("--topic", default=os.getenv("MQTT_TOPIC", "robot/vision"),
                     help="topico MQTT (o variable MQTT_TOPIC)")
-    ap.add_argument("--hz", type=float, default=10, help="maximo de mensajes por segundo")
-    ap.add_argument("--ver", action="store_true", help="mostrar ventana con la deteccion")
+    ap.add_argument("--hz", type=float, default=10,
+                    help="maximo de mensajes MQTT por segundo (no cambia los FPS del video)")
+    ap.add_argument("--ver", action="store_true",
+                    help="mostrar una ventana local de vista previa (desactivada por defecto)")
     ap.add_argument("--sin-mqtt", action="store_true", help="solo imprimir, sin publicar")
     a = ap.parse_args()
     if not a.url:
@@ -155,7 +157,9 @@ def main():
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
-    cap.release(); cv2.destroyAllWindows()
+    cap.release()
+    if a.ver:
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":

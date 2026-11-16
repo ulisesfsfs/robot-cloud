@@ -1,8 +1,9 @@
 # Ojos para RaspiRobot
 
 Proyecto para usar un celular como cámara IP, detectar color, movimiento o
-códigos QR en una Raspberry Pi 3 y enviar los resultados por MQTT a Node-RED.
-La detección publica datos de visión; todavía no controla los motores.
+códigos QR y mostrar el estado de visión en el tablero del RaspiRobot. El flujo
+completo conserva el control del robot y el freno por distancia del SR04; la
+visión solo informa y todavía no controla los motores.
 
 ## Requisitos
 
@@ -11,8 +12,8 @@ La detección publica datos de visión; todavía no controla los motores.
   la misma red.
 - Broker MQTT accesible por la Raspberry Pi y por Node-RED (por ejemplo,
   Mosquitto).
-- Node-RED. El flujo de ejemplo usa nodos incluidos con Node-RED, sin nodos de
-  dashboard adicionales.
+- Node-RED con los módulos `node-red-node-pi-gpiod` y `node-red-node-pisrf`
+  requeridos por los nodos GPIO y SR04 del robot.
 
 ## Instalar en la Raspberry Pi
 
@@ -47,12 +48,15 @@ Iniciar la app de cámara IP en el celular y averiguar su URL de video. Luego:
 
 ```bash
 python vision.py --url http://IP_DEL_CELULAR:PUERTO/video \
-  --modo color --color verde --broker IP_DE_LA_PI --ver
+  --modo color --color verde --broker IP_DE_LA_PI
 ```
 
 El puerto debe coincidir con el configurado en la app. Modos disponibles:
 `color` (`verde`, `azul`, `amarillo`, `rojo`), `movimiento` y `qr`.
-Para probar solo la cámara y la detección sin MQTT, agregar `--sin-mqtt`.
+El script no abre una ventana local por defecto: el video se ve en el dashboard.
+Agregar `--ver` solo si se quiere abrir una vista de diagnóstico en la pantalla
+de la computadora que ejecuta Python. Para probar detección sin MQTT, agregar
+`--sin-mqtt` (esto no envía datos al dashboard).
 
 También se pueden pasar valores sin editar el código:
 
@@ -61,7 +65,7 @@ export VISION_URL="http://IP_DEL_CELULAR:PUERTO/video"
 export MQTT_BROKER="IP_DE_LA_PI"
 export MQTT_PORT=1883
 export MQTT_TOPIC="robot/vision"
-python vision.py --modo color --color verde --ver
+python vision.py --modo color --color verde
 ```
 
 `--url` y `--broker` también pueden pasarse como argumentos y prevalecen sobre
@@ -69,22 +73,41 @@ las variables de entorno. `VISION_URL` es obligatorio si no se da `--url`.
 El broker predeterminado es `localhost`; cuando el broker está en la Pi,
 configurarlo explícitamente si el script corre en otro equipo.
 
-## Conectar Node-RED y probar MQTT
+## Integrar con el tablero del robot y probar MQTT
 
-1. Importar [`flows/flow_vision.json`](flows/flow_vision.json) desde el menú de
-   Node-RED (Import > select a file).
-2. Editar la configuración del broker MQTT del flujo y reemplazar
-   `CAMBIAR_IP_DE_LA_PI` por el host o IP alcanzable desde Node-RED. Si
-   Node-RED corre en Docker, `localhost` apunta al contenedor, no a la Pi.
-3. Implementar y desplegar el flujo. El nodo Debug muestra el JSON recibido
-   desde el tópico `robot/vision`.
-4. Ejecutar `vision.py` con `--broker` apuntando al mismo broker. El proceso
-   que publica y Node-RED deben usar el mismo tópico.
+`flows/flow_vision.json` contiene el flujo completo exportado del robot
+(movimiento, tablero web, servo y SR04), una vista en vivo configurable de la
+cámara del celular y el indicador de detección recibido por MQTT. Antes de
+reemplazar el flujo de Node-RED, exportá una copia de seguridad. Si ya
+importaste flujos anteriores de este proyecto,
+eliminá únicamente sus pestañas `Movimiento robot`, `Robot Dashboard` y
+`Vision RaspiRobot` (si existen) antes de importar el flujo completo; así
+evitás dejar controles o rutas HTTP duplicadas. No borres otras pestañas tuyas.
+
+1. Importar `flows/flow_vision.json` desde el menú de Node-RED (Import > select
+   a file). En la configuración `Broker MQTT del robot`, reemplazar
+   `CAMBIAR_HOST_DEL_BROKER` por el host del broker que Node-RED pueda alcanzar.
+   Para Mosquitto en la misma computadora que Node-RED, `localhost` sirve; con
+   Node-RED en Docker, `localhost` apunta al contenedor, no al host.
+2. Confirmar que Node-RED tiene los módulos GPIO/SR04 instalados. En una
+   computadora sin Raspberry Pi, esos nodos de hardware no funcionarán; se
+   puede probar la conexión MQTT y la página del tablero, pero no los motores
+   ni el sensor.
+3. Implementar el flujo y abrir `http://IP_DE_LA_MAQUINA_NODE_RED:1880/robot`.
+   En la sección “Cámara en vivo”, ingresá la URL del celular
+   (por ejemplo `http://IP_DEL_CELULAR:8080/video`) y presioná “Conectar”. La
+   dirección se guarda solo en el navegador; no se agrega al flujo del repo.
+   El celular debe seguir transmitiendo y el navegador que muestra el tablero
+   debe poder acceder a esa URL.
+4. Ejecutar `vision.py` con `--broker` apuntando al mismo broker. El script y
+   Node-RED deben usar el mismo tópico `robot/vision`. El tablero mostrará modo,
+   detección y posición mientras el script siga ejecutándose. La vista del
+   video y el proceso de detección son independientes.
 
 Para observar mensajes desde una terminal adicional:
 
 ```bash
-mosquitto_sub -h IP_DEL_BROKER -t robot/vision -v
+mosquitto_sub -h HOST_DEL_BROKER -t robot/vision -v
 ```
 
 Cada mensaje es JSON, por ejemplo:
@@ -97,10 +120,33 @@ Cada mensaje es JSON, por ejemplo:
 `area` es la fracción de imagen ocupada y solo aproxima el tamaño aparente.
 En modo QR también se publica `texto`.
 
+### Si el video se ve lento o se traba
+
+El video del dashboard va directamente del celular al navegador. El parámetro
+`--hz` de `vision.py` limita solo la frecuencia de mensajes de detección MQTT;
+no aumenta los FPS de la cámara. Ajustá en la app del celular una resolución
+moderada (por ejemplo 640x480 o 320x240), bajá la calidad si la red está
+cargada y seleccioná una tasa de cuadros estable. Confirmá que el stream abra
+sin cortes directamente desde el navegador en
+`http://IP_DEL_CELULAR:PUERTO/video` y que ambos equipos estén en una red local
+con buena señal Wi-Fi. Luego ingresá esa misma URL en el panel “Cámara en vivo”.
+
+La detección procesa cuadros reducidos a 320x240 para limitar el trabajo en la
+Raspberry Pi. Si el video del navegador está fluido pero las detecciones llegan
+con demora, revisar carga de CPU de la Pi y reducir `--hz` (por ejemplo
+`--hz 5`); esto reduce publicaciones MQTT, no los FPS del video.
+
+El indicador de detección marca que no hay señal si no recibe un mensaje en
+3 segundos. El video en vivo se conecta directamente desde el navegador al
+celular y puede seguir viéndose aunque `vision.py` esté detenido. Para
+actualizar detecciones y posición, sí se necesita el script en ejecución. La
+integración no activa conducción automática: los
+comandos del joystick y el freno del SR04 conservan su funcionamiento original.
+
 ## Orden sugerido de pruebas
 
 1. Confirmar que celular y Pi se ven en la misma red y que la URL de video abre.
-2. Ejecutar la detección con `--sin-mqtt --ver` y verificar el encuadre y el
+2. Ejecutar la detección con `--sin-mqtt` y verificar el encuadre y el
    color; ajustar la luz y probar movimiento y QR si corresponde.
 3. Probar Mosquitto por separado con `mosquitto_sub` y comprobar el tópico.
 4. Importar Node-RED, configurar el broker y confirmar que su Debug recibe los
@@ -127,21 +173,19 @@ En modo QR también se publica `texto`.
   código o en el flujo. El `.gitignore` excluye `.env` y archivos `*.pem`, pero
   revisar los cambios antes de publicar.
 
-## Subirlo a la otra cuenta de GitHub
+## Actualizar el repositorio de GitHub
 
-Este directorio no está inicializado como repositorio Git y no se creó ni subió
-nada a GitHub. En la cuenta correcta, crear un repositorio **privado**, agregar
-a los compañeros como colaboradores y luego, desde esta carpeta, ejecutar los
-comandos que GitHub indique. Por ejemplo:
+El proyecto debe mantenerse en el repositorio privado de la cuenta correcta.
+Después de revisar los cambios, subilos desde esta carpeta:
 
 ```bash
-git init
-git add README.md requirements.txt vision.py flows/ docs/ .gitignore
-git commit -m "Preparar proyecto de vision para RaspiRobot"
-git branch -M main
-git remote add origin URL_DEL_REPOSITORIO_PRIVADO
-git push -u origin main
+git status
+git add README.md docs/pines.md flows/flow_vision.json
+git diff --cached --check
+git commit -m "Integrar estado de camara al flujo del robot"
+git push
 ```
 
-Antes de `git add`, confirmar que se está usando la cuenta correcta y revisar
-que no haya secretos o archivos locales en los cambios.
+Si aún no creaste el repositorio privado en la otra cuenta, hacelo allí y
+configurá `origin` con su URL antes de subir. Revisá que no haya secretos o
+archivos locales en los cambios.
