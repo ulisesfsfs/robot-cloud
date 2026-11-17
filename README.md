@@ -44,11 +44,34 @@ y no instalar OpenCV con `pip`.
 
 ## Ejecutar
 
-Iniciar la app de cámara IP en el celular y averiguar su URL de video. Luego:
+### Datos que hay que configurar
+
+Antes de ejecutar, anotá estos datos. Las direcciones IP pueden cambiar al
+conectarse a otra red; confirmalas ese día y no las guardes en el repositorio.
+
+| Dato | Qué valor usar | Dónde configurarlo |
+|---|---|---|
+| URL del video del celular | `http://IP_DEL_CELULAR:PUERTO/video` | En el campo “Cámara en vivo” del dashboard y en `--url` para el detector |
+| Host del broker MQTT | IP o nombre de la computadora donde corre Mosquitto, alcanzable desde la Pi y Node-RED | `--broker` para Python y configuración `Broker MQTT del robot` en Node-RED |
+| Puerto MQTT | Normalmente `1883` | `--puerto` y configuración del broker |
+| Tópico de visión | `robot/vision` | Es el predeterminado del script y el tópico al que se suscribe el flujo |
+| Modo y objetivo | Por ejemplo, modo `color` y color `verde` | Argumentos `--modo` y `--color` |
+| Dirección del dashboard | `http://IP_DE_LA_PI:1880/robot` | Abrir en el navegador; requiere Node-RED en la Pi |
+
+El broker no tiene que correr en la Pi, pero Python y Node-RED deben conectarse
+al mismo broker usando direcciones que ambos puedan alcanzar. Si Node-RED está
+en Docker, `localhost` normalmente no es la computadora anfitriona: usá una IP o
+nombre alcanzable desde el contenedor. La URL del stream se guarda en el
+navegador del dashboard; no queda escrita en el flujo.
+
+### Ejecutar el detector
+
+Iniciá la app de cámara IP en el celular y averiguá la URL de video. Luego:
 
 ```bash
 python vision.py --url http://IP_DEL_CELULAR:PUERTO/video \
-  --modo color --color verde --broker IP_DE_LA_PI
+  --modo color --color verde --broker HOST_DEL_BROKER --puerto 1883 \
+  --topic robot/vision
 ```
 
 El puerto debe coincidir con el configurado en la app. Modos disponibles:
@@ -58,20 +81,22 @@ Agregar `--ver` solo si se quiere abrir una vista de diagnóstico en la pantalla
 de la computadora que ejecuta Python. Para probar detección sin MQTT, agregar
 `--sin-mqtt` (esto no envía datos al dashboard).
 
-También se pueden pasar valores sin editar el código:
+También se pueden pasar la URL y los datos del broker mediante variables de
+entorno, sin editar el código:
 
 ```bash
 export VISION_URL="http://IP_DEL_CELULAR:PUERTO/video"
-export MQTT_BROKER="IP_DE_LA_PI"
+export MQTT_BROKER="HOST_DEL_BROKER"
 export MQTT_PORT=1883
 export MQTT_TOPIC="robot/vision"
 python vision.py --modo color --color verde
 ```
 
 `--url` y `--broker` también pueden pasarse como argumentos y prevalecen sobre
-las variables de entorno. `VISION_URL` es obligatorio si no se da `--url`.
-El broker predeterminado es `localhost`; cuando el broker está en la Pi,
-configurarlo explícitamente si el script corre en otro equipo.
+las variables de entorno. El modo y el color se seleccionan con argumentos.
+`VISION_URL` es obligatorio si no se da `--url`. El broker predeterminado es
+`localhost`; usalo solo si Mosquitto corre en el mismo equipo donde se ejecuta
+Python.
 
 ## Integrar con el tablero del robot y probar MQTT
 
