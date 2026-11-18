@@ -39,9 +39,12 @@ de `requirements.txt`:
 python -m pip install -r requirements.txt
 ```
 
-En Raspberry Pi, `opencv-python` de PyPI puede no tener una rueda adecuada para
-el sistema o la arquitectura; en ese caso, usar los paquetes `apt` anteriores
-y no instalar OpenCV con `pip`.
+Una “rueda” (wheel) es un paquete precompilado de Python. En Raspberry Pi puede
+no haber una rueda de `opencv-python` compatible con la arquitectura ARM o la
+versión de Python instalada. Por eso, en la Pi se recomienda instalar OpenCV
+con `apt` y crear el entorno virtual con `--system-site-packages`, para que ese
+entorno pueda importar `cv2` desde los paquetes del sistema. No hace falta
+instalar `opencv-python` con `pip` en la Pi.
 
 ## Preparar la Pi desde otra computadora
 
@@ -337,19 +340,171 @@ solo en la detección visual.
 7. Con el robot presente, confirmar el mapeo de motores y probar primero a
    velocidad baja; consultar [`docs/pines.md`](docs/pines.md).
 
-## Problemas conocidos y seguridad
+## Solución de problemas frecuentes
 
-- Si `venv` muestra `externally-managed-environment`, no instalar paquetes en
-  el Python administrado por el sistema. Crear el entorno como arriba con
-  `--system-site-packages` y usar los paquetes `apt`.
-- Si no llegan imágenes, revisar que la app siga transmitiendo, la ruta
-  (`/video`), el puerto y que la red permita conexiones entre dispositivos.
-- Si Node-RED está en Docker, configurar en el broker una dirección accesible
-  desde el contenedor. Revisar también el firewall y que Mosquitto escuche en
-  la interfaz de red necesaria.
-- No guardar contraseñas, claves privadas, certificados ni IPs personales en el
-  código o en el flujo. El `.gitignore` excluye `.env` y archivos `*.pem`, pero
-  revisar los cambios antes de publicar.
+### `ssh`: conexión rechazada o timeout
+
+En la computadora, verificá que estés en la misma red y que la IP y el usuario
+sean los de la Pi:
+
+```bash
+ssh USUARIO@IP_DE_LA_PI
+```
+
+Si la Pi responde “connection refused” y tenés acceso a su terminal, comprobá
+SSH e iniciá el servicio:
+
+```bash
+sudo systemctl status ssh --no-pager
+sudo systemctl enable --now ssh
+```
+
+Si `ssh.service` no existe, instalá el servidor SSH desde la terminal de la Pi:
+
+```bash
+sudo apt update
+sudo apt install openssh-server
+sudo systemctl enable --now ssh
+```
+
+Un timeout suele indicar IP incorrecta, equipos en redes distintas o SSH no
+habilitado. No desactives el firewall completo; pedí ayuda al responsable de la
+red si el puerto SSH está bloqueado.
+
+### `apt update` falla o no encuentra paquetes
+
+Comprobá conexión, resolución DNS y hora:
+
+```bash
+ping -c 3 1.1.1.1
+getent hosts deb.debian.org
+timedatectl status
+```
+
+Si la hora está incorrecta y la Pi tiene red, habilitá la sincronización y
+reintentá:
+
+```bash
+sudo timedatectl set-ntp true
+sudo apt update
+```
+
+Si `apt` informa que un paquete no tiene candidato, verificá la versión del
+sistema y si el repositorio ofrece los paquetes:
+
+```bash
+cat /etc/os-release
+apt-cache policy python3-opencv python3-paho-mqtt python3-numpy
+```
+
+No reemplaces automáticamente OpenCV del sistema con `pip`: la rueda puede no
+ser compatible con la Pi.
+
+### `externally-managed-environment` al instalar con `pip`
+
+Ese mensaje protege el Python administrado por Raspberry Pi OS. No uses
+`sudo pip` ni `--break-system-packages`. Instalá las dependencias con `apt` y
+creá/activá el entorno así:
+
+```bash
+sudo apt install python3-opencv python3-paho-mqtt python3-numpy python3-venv
+cd ~/robot-cloud
+python3 -m venv --system-site-packages .venv
+source .venv/bin/activate
+```
+
+### `No module named cv2` o `No module named paho`
+
+Confirmá que el entorno está activado y que se creó con
+`--system-site-packages`:
+
+```bash
+cd ~/robot-cloud
+source .venv/bin/activate
+python -c 'import cv2, numpy, paho.mqtt.client; print("OpenCV", cv2.__version__); print("NumPy", numpy.__version__); print("Paho MQTT: OK")'
+```
+
+Si la importación falla, instalá los paquetes del sistema y volvé a crear el
+entorno para asegurar que tenga acceso a ellos:
+
+```bash
+deactivate 2>/dev/null || true
+sudo apt update
+sudo apt install --reinstall python3-opencv python3-paho-mqtt python3-numpy python3-venv
+python3 -m venv --clear --system-site-packages .venv
+source .venv/bin/activate
+python -c 'import cv2, numpy, paho.mqtt.client; print("Dependencias Python: OK")'
+```
+
+`--clear` reemplaza el contenido del entorno `.venv` de este proyecto; no borra
+el código del repo.
+
+### Mosquitto: `Connection refused` o no aparecen mensajes
+
+En la Pi, comprobá e iniciá el broker:
+
+```bash
+systemctl is-active mosquitto
+sudo systemctl enable --now mosquitto
+sudo ss -ltnp 'sport = :1883'
+```
+
+Si Mosquitto no está instalado:
+
+```bash
+sudo apt update
+sudo apt install mosquitto mosquitto-clients
+sudo systemctl enable --now mosquitto
+```
+
+Como todo corre en la misma Pi, configurá `localhost` en Node-RED y usá
+`--broker localhost` en `vision.py`. Probá el tópico en dos terminales de la
+Pi: en una ejecutá `mosquitto_sub -h 127.0.0.1 -t robot/vision -v`; en la otra:
+
+```bash
+mosquitto_pub -h 127.0.0.1 -t robot/vision \
+  -m '{"detectado":true,"x":0.5,"area":0.01,"modo":"prueba"}'
+```
+
+Si el comando no existe, instalá `mosquitto-clients`. Si aparece
+`Not authorized`, el broker exige credenciales: no desactives la seguridad ni
+cambies su configuración a ciegas; el script actual no admite usuario y
+contraseña.
+
+### La cámara no abre o el dashboard dice “Cámara sin señal”
+
+- Asegurate de que la app del celular esté transmitiendo y que la URL termine
+  con la ruta correcta, normalmente `/video`.
+- Desde el navegador del dashboard, abrí directamente
+  `http://IP_DEL_CELULAR:PUERTO/video`. Si no abre ahí, revisá Wi-Fi, IP y
+  puerto antes de probar Python.
+- Ingresá la misma URL en “Cámara en vivo” y en `--url` de `vision.py`. Tanto
+  el navegador como la Pi necesitan alcanzar el celular.
+- Ejecutá el detector sin `--sin-mqtt` y con `--broker localhost`. El video
+  puede verse aunque el detector esté detenido, pero el estado de detección
+  requiere que el proceso siga corriendo.
+- Si `vision.py` muestra “Sin imagen. Reintentando…”, detenelo con `Ctrl+C`,
+  revisá la URL y probá de nuevo.
+
+### Video lento o ventana local inesperada
+
+El video del dashboard va directamente del celular al navegador. Bajá la
+resolución/calidad o el FPS de la app del celular y probá una red Wi-Fi estable.
+`--hz` limita publicaciones MQTT, no los FPS del video. El script no abre una
+ventana local salvo que agregues `--ver`; quitá esa opción para ejecutar sin
+ventana.
+
+### Node-RED muestra nodos GPIO/SR04 desconocidos
+
+En Node-RED abrí **Menu > Manage palette > Install** e instalá
+`node-red-node-pi-gpiod` y `node-red-node-pisrf`; reiniciá Node-RED si lo pide.
+Hacé una copia de seguridad del flujo antes de importar o reemplazar pestañas.
+No pruebes motores hasta confirmar que los pines coinciden con la placa real.
+
+La detección de visión solo informa en el dashboard: no manda órdenes a los
+motores. El SR04 y su lógica de freno se mantienen aparte. No guardes
+contraseñas, claves privadas, certificados ni IPs personales en el código o en
+el flujo; revisá los cambios antes de publicar el repo.
 
 ## Actualizar el repositorio público de GitHub
 
