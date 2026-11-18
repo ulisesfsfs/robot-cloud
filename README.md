@@ -21,7 +21,8 @@ La opción recomendada en Raspberry Pi OS es instalar los paquetes del sistema:
 
 ```bash
 sudo apt update
-sudo apt install python3-opencv python3-paho-mqtt python3-numpy python3-venv
+sudo apt install python3-opencv python3-paho-mqtt python3-numpy python3-venv \
+  mosquitto mosquitto-clients unzip
 ```
 
 Desde la carpeta del proyecto, crear un entorno que pueda usar esos paquetes:
@@ -42,6 +43,56 @@ En Raspberry Pi, `opencv-python` de PyPI puede no tener una rueda adecuada para
 el sistema o la arquitectura; en ese caso, usar los paquetes `apt` anteriores
 y no instalar OpenCV con `pip`.
 
+## Preparar la Pi desde otra computadora
+
+1. Conectá la computadora y la Raspberry Pi a la misma red. En una terminal de
+   la computadora, conectate usando el usuario y la IP de la Pi:
+
+   ```bash
+   ssh USUARIO@IP_DE_LA_PI
+   ```
+
+   Aceptá la huella digital solo si confirmaste que corresponde a tu Pi y
+   escribí la contraseña cuando la solicite (no se muestra al tipear). Para
+   volver a la computadora, ejecutá `exit`.
+
+2. Si la Pi tiene Internet, cloná el repositorio público directamente desde
+   GitHub:
+
+   ```bash
+   git clone https://github.com/ulisesfsfs/robot-cloud.git ~/robot-cloud
+   ```
+
+   Si GitHub no está disponible en la red de la facultad, copiá un ZIP desde la
+   computadora. En la computadora, desde el repo local, creá el archivo con el
+   commit que querés llevar:
+
+   ```bash
+   git archive --format=zip -o ../robot-cloud-clase.zip HEAD
+   scp ../robot-cloud-clase.zip USUARIO@IP_DE_LA_PI:~
+   ```
+
+   Después, en una sesión SSH con la Pi:
+
+   ```bash
+   mkdir -p ~/robot-cloud
+   unzip -o ~/robot-cloud-clase.zip -d ~/robot-cloud
+   ```
+
+3. En la Pi, instalá los paquetes indicados arriba y creá el entorno:
+
+   ```bash
+   sudo apt update
+   sudo apt install python3-opencv python3-paho-mqtt python3-numpy \
+     python3-venv mosquitto mosquitto-clients unzip
+   cd ~/robot-cloud
+   python3 -m venv --system-site-packages .venv
+   source .venv/bin/activate
+   ```
+
+   Los nodos de Node-RED para GPIO/SR04 son dependencias separadas. Confirmá
+   que estén instalados en la Pi antes de probar motores o sensor.
+
 ## Ejecutar
 
 ### Datos que hay que configurar
@@ -52,17 +103,84 @@ conectarse a otra red; confirmalas ese día y no las guardes en el repositorio.
 | Dato | Qué valor usar | Dónde configurarlo |
 |---|---|---|
 | URL del video del celular | `http://IP_DEL_CELULAR:PUERTO/video` | En el campo “Cámara en vivo” del dashboard y en `--url` para el detector |
-| Host del broker MQTT | IP o nombre de la computadora donde corre Mosquitto, alcanzable desde la Pi y Node-RED | `--broker` para Python y configuración `Broker MQTT del robot` en Node-RED |
+| Host del broker MQTT | `localhost` si Mosquitto corre en la misma Pi | `--broker` para Python y configuración `Broker MQTT del robot` en Node-RED |
 | Puerto MQTT | Normalmente `1883` | `--puerto` y configuración del broker |
 | Tópico de visión | `robot/vision` | Es el predeterminado del script y el tópico al que se suscribe el flujo |
 | Modo y objetivo | Por ejemplo, modo `color` y color `verde` | Argumentos `--modo` y `--color` |
 | Dirección del dashboard | `http://IP_DE_LA_PI:1880/robot` | Abrir en el navegador; requiere Node-RED en la Pi |
 
-El broker no tiene que correr en la Pi, pero Python y Node-RED deben conectarse
-al mismo broker usando direcciones que ambos puedan alcanzar. Si Node-RED está
-en Docker, `localhost` normalmente no es la computadora anfitriona: usá una IP o
-nombre alcanzable desde el contenedor. La URL del stream se guarda en el
-navegador del dashboard; no queda escrita en el flujo.
+Para la prueba prevista, Mosquitto, Node-RED y `vision.py` corren en la misma
+Pi: configurá `localhost` en los tres. El celular es la fuente de video y debe
+estar en la misma red Wi‑Fi que la Pi; el navegador que abre el dashboard
+también debe poder acceder a la URL de video. Si más adelante Node-RED corre en
+Docker u otro equipo, `localhost` puede dejar de ser la dirección correcta.
+La URL del stream se guarda en el navegador del dashboard; no queda escrita en
+el flujo.
+
+### Verificar Mosquitto antes de ejecutar
+
+En una terminal de la Pi, comprobar si el servicio está instalado y activo:
+
+```bash
+systemctl is-active mosquitto
+```
+
+Si devuelve `active`, el servicio está corriendo. Si devuelve `inactive` o
+`failed`, iniciarlo y revisar el resultado:
+
+```bash
+sudo systemctl start mosquitto
+sudo systemctl status mosquitto --no-pager
+```
+
+Si indica que la unidad no existe, instalar el broker y sus clientes:
+
+```bash
+sudo apt update
+sudo apt install mosquitto mosquitto-clients
+sudo systemctl start mosquitto
+```
+
+Comprobar que hay un proceso escuchando en el puerto MQTT habitual, `1883`:
+
+```bash
+sudo ss -ltnp 'sport = :1883'
+```
+
+Si la salida muestra `127.0.0.1:1883`, solo acepta clientes locales; alcanza
+cuando `vision.py`, Mosquitto y Node-RED corren directamente en la misma Pi.
+Si el publicador o Node-RED corren en otro dispositivo, el broker debe escuchar
+en una interfaz de red alcanzable y el firewall debe permitir el puerto `1883`
+desde esa red. No expongas el broker a Internet ni habilites conexiones
+anónimas en una red no confiable.
+
+Probar publicación y suscripción localmente en la Pi. En una terminal, dejar
+esto escuchando:
+
+```bash
+mosquitto_sub -h 127.0.0.1 -t robot/vision -v
+```
+
+En otra terminal, publicar un mensaje de prueba:
+
+```bash
+mosquitto_pub -h 127.0.0.1 -t robot/vision \
+  -m '{"detectado":true,"x":0.5,"area":0.01,"modo":"prueba"}'
+```
+
+El mensaje debe aparecer en la terminal de `mosquitto_sub`. Para verificar un
+broker en otro equipo, reemplazar `127.0.0.1` por su host/IP en ambos comandos;
+esa conexión también tiene que estar permitida por la configuración de red y
+firewall.
+
+La autenticación MQTT es una opción del broker para exigir usuario y contraseña
+a cada cliente. Para la prueba local en una sola Pi, no necesitás configurar
+credenciales si Mosquitto acepta conexiones locales sin autenticación (la
+configuración local predeterminada habitual). Si al conectar aparece
+`Not authorized`, el broker está configurado para pedir credenciales; la versión
+actual de `vision.py` no acepta usuario y contraseña, así que no cambies el
+broker a ciegas: revisá su configuración con quien administre la Pi. No guardes
+contraseñas en el código, el README ni el flujo exportado.
 
 ### Ejecutar el detector
 
@@ -70,7 +188,7 @@ Iniciá la app de cámara IP en el celular y averiguá la URL de video. Luego:
 
 ```bash
 python vision.py --url http://IP_DEL_CELULAR:PUERTO/video \
-  --modo color --color verde --broker HOST_DEL_BROKER --puerto 1883 \
+  --modo color --color verde --broker localhost --puerto 1883 \
   --topic robot/vision
 ```
 
@@ -86,7 +204,7 @@ entorno, sin editar el código:
 
 ```bash
 export VISION_URL="http://IP_DEL_CELULAR:PUERTO/video"
-export MQTT_BROKER="HOST_DEL_BROKER"
+export MQTT_BROKER="localhost"
 export MQTT_PORT=1883
 export MQTT_TOPIC="robot/vision"
 python vision.py --modo color --color verde
@@ -111,28 +229,48 @@ evitás dejar controles o rutas HTTP duplicadas. No borres otras pestañas tuyas
 
 1. Importar `flows/flow_vision.json` desde el menú de Node-RED (Import > select
    a file). En la configuración `Broker MQTT del robot`, reemplazar
-   `CAMBIAR_HOST_DEL_BROKER` por el host del broker que Node-RED pueda alcanzar.
-   Para Mosquitto en la misma computadora que Node-RED, `localhost` sirve; con
-   Node-RED en Docker, `localhost` apunta al contenedor, no al host.
-2. Confirmar que Node-RED tiene los módulos GPIO/SR04 instalados. En una
-   computadora sin Raspberry Pi, esos nodos de hardware no funcionarán; se
-   puede probar la conexión MQTT y la página del tablero, pero no los motores
-   ni el sensor.
+   `CAMBIAR_HOST_DEL_BROKER` por `localhost`, dado que Mosquitto y Node-RED
+   correrán directamente en la misma Pi. Si Node-RED estuviera en Docker, esta
+   dirección tendría que revisarse porque `localhost` apuntaría al contenedor.
+2. Confirmar que Node-RED tiene los módulos `node-red-node-pi-gpiod` y
+   `node-red-node-pisrf` instalados. Si faltan, instalarlos desde **Menu >
+   Manage palette > Install** y reiniciar Node-RED si lo solicita.
 3. Implementar el flujo y abrir `http://IP_DE_LA_MAQUINA_NODE_RED:1880/robot`.
    En la sección “Cámara en vivo”, ingresá la URL del celular
    (por ejemplo `http://IP_DEL_CELULAR:8080/video`) y presioná “Conectar”. La
    dirección se guarda solo en el navegador; no se agrega al flujo del repo.
    El celular debe seguir transmitiendo y el navegador que muestra el tablero
    debe poder acceder a esa URL.
-4. Ejecutar `vision.py` con `--broker` apuntando al mismo broker. El script y
-   Node-RED deben usar el mismo tópico `robot/vision`. El tablero mostrará modo,
-   detección y posición mientras el script siga ejecutándose. La vista del
-   video y el proceso de detección son independientes.
+4. Ejecutar `vision.py` con `--broker localhost`. El script y Node-RED deben
+   usar el mismo tópico `robot/vision`. El tablero mostrará modo, detección y
+   posición mientras el script siga ejecutándose. La vista del video y el
+   proceso de detección son independientes.
+
+### Secuencia rápida de prueba en clase
+
+1. En la Pi, verificar Mosquitto y el puerto `1883` siguiendo los pasos
+   anteriores.
+2. En Node-RED, exportar una copia de seguridad, importar este flujo, cambiar
+   el broker a `localhost` y hacer Deploy. Confirmar que estén instalados los
+   módulos de Node-RED para GPIO/SR04.
+3. Desde el navegador de un equipo en la misma red, abrir
+   `http://IP_DE_LA_PI:1880/robot`. Iniciar la app de cámara del celular,
+   ingresar su URL en “Cámara en vivo” y conectar. El navegador debe poder
+   acceder a esa URL.
+4. En una terminal SSH de la Pi, ejecutar `cd ~/robot-cloud` y
+   `source .venv/bin/activate`; luego iniciar `vision.py` con la URL del celular
+   y `--broker localhost`, sin `--sin-mqtt`. Dejar el proceso corriendo para
+   que sigan llegando las detecciones.
+5. Presentar un objeto del color elegido y confirmar en el dashboard el estado
+   y la posición. Detener el detector con `Ctrl+C`.
+6. Probar motores y SR04 solo después de comprobar el mapeo de pines y la placa;
+   comenzar con las ruedas levantadas, velocidad baja y una forma inmediata de
+   frenar.
 
 Para observar mensajes desde una terminal adicional:
 
 ```bash
-mosquitto_sub -h HOST_DEL_BROKER -t robot/vision -v
+mosquitto_sub -h 127.0.0.1 -t robot/vision -v
 ```
 
 Cada mensaje es JSON, por ejemplo:
@@ -168,6 +306,21 @@ actualizar detecciones y posición, sí se necesita el script en ejecución. La
 integración no activa conducción automática: los
 comandos del joystick y el freno del SR04 conservan su funcionamiento original.
 
+### Qué falta para que la visión mueva el robot
+
+Actualmente `vision.py` analiza el video y publica detecciones en `robot/vision`.
+Node-RED valida esos mensajes y los muestra en el dashboard, pero no los conecta
+a los nodos de motores o servo. El control de actuadores sigue siendo manual y
+el SR04 mantiene su freno por distancia.
+
+Para agregar seguimiento visual, primero hay que decidir el comportamiento
+(por ejemplo, girar el servo hacia un objeto del color elegido), cómo se activa
+y desactiva el modo automático y qué hacer cuando se pierde la detección.
+Después se integra esa lógica en Node-RED con límites de velocidad, parada
+segura y prioridad del SR04, y se valida con el robot presente. No se debe
+interpretar `area` como una medición de distancia ni mover el robot basándose
+solo en la detección visual.
+
 ## Orden sugerido de pruebas
 
 1. Confirmar que celular y Pi se ven en la misma red y que la URL de video abre.
@@ -198,9 +351,8 @@ comandos del joystick y el freno del SR04 conservan su funcionamiento original.
   código o en el flujo. El `.gitignore` excluye `.env` y archivos `*.pem`, pero
   revisar los cambios antes de publicar.
 
-## Actualizar el repositorio de GitHub
+## Actualizar el repositorio público de GitHub
 
-El proyecto debe mantenerse en el repositorio privado de la cuenta correcta.
 Después de revisar los cambios, subilos desde esta carpeta:
 
 ```bash
@@ -211,6 +363,10 @@ git commit -m "Integrar estado de camara al flujo del robot"
 git push
 ```
 
-Si aún no creaste el repositorio privado en la otra cuenta, hacelo allí y
-configurá `origin` con su URL antes de subir. Revisá que no haya secretos o
-archivos locales en los cambios.
+Si el remoto todavía no está configurado, agregá la URL del repo público:
+
+```bash
+git remote add origin https://github.com/ulisesfsfs/robot-cloud.git
+```
+
+Revisá que no haya secretos o archivos locales antes de publicar cambios.
