@@ -1,22 +1,352 @@
 [
   {
-    "id": "avanzar",
+    "id": "891dd4f4bea18605",
     "type": "tab",
     "label": "Movimiento robot",
     "disabled": false,
     "info": "Flow mínimo para que el robot avance. Mueve las dos borneras (L y R) a la vez, así funciona esté el motor en la que esté."
   },
   {
-    "id": "robotdash",
+    "id": "57cb155c8e043b9f",
     "type": "tab",
     "label": "Robot Dashboard",
     "disabled": false,
-    "info": "Tablero web para manejar el robot.\nAbrir en el navegador: http://<IP-del-robot>:1880/robot\n\nIncluye motor (adelante/atrás/stop + velocidad) y servo de dirección (GPIO 2)."
+    "info": "Tablero web para manejar el robot.\nAbrir en el navegador: http://<IP-del-robot>:1880/robot\n\nMotores + servo de dirección (GPIO 2). Sensor HC-SR04 (GPIO 18/23) con script propio.\nSemáforo: rojo GPIO 11 / amarillo GPIO 22 / verde GPIO 9. Buzzer: GPIO 15.\nCámara: panel 'Cámara en vivo' y estado de visión (vision.py por MQTT, pestaña Vision RaspiRobot)."
   },
   {
-    "id": "a1",
+    "id": "57b332e36ceceea9",
+    "type": "tab",
+    "label": "Vision RaspiRobot",
+    "disabled": false,
+    "info": "Recibe por MQTT los resultados JSON de vision.py."
+  },
+  {
+    "id": "a2b7df64b3a758bd",
+    "type": "mqtt-broker",
+    "name": "Intancia A",
+    "broker": "localhost",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": 4,
+    "keepalive": 60,
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "b1d0c0a1e2f34001",
+    "type": "ui-base",
+    "name": "My Dashboard",
+    "path": "/dashboard",
+    "includeClientData": true,
+    "acceptsClientConfig": [
+      "ui-notification",
+      "ui-control"
+    ],
+    "showPathInSidebar": false,
+    "navigationStyle": "default",
+    "titleBarStyle": "default"
+  },
+  {
+    "id": "b1d0c0a1e2f34002",
+    "type": "ui-theme",
+    "name": "Default Theme",
+    "colors": {
+      "surface": "#ffffff",
+      "primary": "#0094CE",
+      "bgPage": "#eeeeee",
+      "groupBg": "#ffffff",
+      "groupOutline": "#cccccc"
+    },
+    "sizes": {
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "4px",
+      "widgetGap": "12px"
+    }
+  },
+  {
+    "id": "b1d0c0a1e2f34003",
+    "type": "ui-page",
+    "name": "Page 1",
+    "ui": "b1d0c0a1e2f34001",
+    "path": "/page1",
+    "icon": "home",
+    "layout": "grid",
+    "theme": "b1d0c0a1e2f34002",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "sm": "3",
+        "md": "6",
+        "lg": "9",
+        "xl": "12"
+      }
+    ],
+    "order": 1,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "b1d0c0a1e2f34004",
+    "type": "ui-page",
+    "name": "Page 2",
+    "ui": "b1d0c0a1e2f34001",
+    "path": "/page2",
+    "icon": "home",
+    "layout": "grid",
+    "theme": "b1d0c0a1e2f34002",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "sm": "3",
+        "md": "6",
+        "lg": "9",
+        "xl": "12"
+      }
+    ],
+    "order": 3,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "b1d0c0a1e2f34005",
+    "type": "ui-group",
+    "name": "Group 1",
+    "page": "b1d0c0a1e2f34003",
+    "width": "6",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "b1d0c0a1e2f34006",
+    "type": "ui-group",
+    "name": "Page 2",
+    "page": "b1d0c0a1e2f34004",
+    "width": "6",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "e5a0c1d2b3f40010",
+    "type": "ui-page",
+    "name": "Estacionamiento",
+    "ui": "b1d0c0a1e2f34001",
+    "path": "/estacionamiento",
+    "icon": "car",
+    "layout": "grid",
+    "theme": "b1d0c0a1e2f34002",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "sm": "3",
+        "md": "6",
+        "lg": "9",
+        "xl": "12"
+      }
+    ],
+    "order": 4,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "e5a0c1d2b3f40011",
+    "type": "ui-group",
+    "name": "Acceso - Barrera",
+    "page": "e5a0c1d2b3f40010",
+    "width": "6",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "e5a0c1d2b3f40012",
+    "type": "ui-group",
+    "name": "Ventilación - CO",
+    "page": "e5a0c1d2b3f40010",
+    "width": "6",
+    "height": "1",
+    "order": 2,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "a1f0c2d3e4b50002",
+    "type": "mqtt-broker",
+    "name": "Broker local",
+    "broker": "localhost",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "a1f0c2d3e4b50004",
+    "type": "ui-theme",
+    "name": "Tema robot",
+    "colors": {
+      "surface": "#ffffff",
+      "primary": "#0094CE",
+      "bgPage": "#eeeeee",
+      "groupBg": "#ffffff",
+      "groupOutline": "#cccccc"
+    },
+    "sizes": {
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "4px",
+      "widgetGap": "12px"
+    }
+  },
+  {
+    "id": "a1f0c2d3e4b50005",
+    "type": "ui-page",
+    "name": "Visión del robot",
+    "ui": "b1d0c0a1e2f34001",
+    "path": "/vision",
+    "icon": "camera",
+    "layout": "grid",
+    "theme": "a1f0c2d3e4b50004",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "sm": "3",
+        "md": "6",
+        "lg": "9",
+        "xl": "12"
+      }
+    ],
+    "order": 2,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "a1f0c2d3e4b50006",
+    "type": "ui-group",
+    "name": "Cámara",
+    "page": "a1f0c2d3e4b50005",
+    "width": "6",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "a1f0c2d3e4b50007",
+    "type": "ui-group",
+    "name": "Decisión del robot",
+    "page": "a1f0c2d3e4b50005",
+    "width": "6",
+    "height": "1",
+    "order": 2,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "vision-broker",
+    "type": "mqtt-broker",
+    "name": "Broker MQTT del robot",
+    "broker": "127.0.0.1",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "4de10c50b297f83d",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "▶ Adelante",
     "props": [
       {
@@ -34,14 +364,14 @@
     "y": 80,
     "wires": [
       [
-        "fn"
+        "5144fef5d4ec1329"
       ]
     ]
   },
   {
-    "id": "a2",
+    "id": "6673cb3ebd50b553",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "◀ Atrás",
     "props": [
       {
@@ -59,14 +389,14 @@
     "y": 140,
     "wires": [
       [
-        "fn"
+        "5144fef5d4ec1329"
       ]
     ]
   },
   {
-    "id": "a3",
+    "id": "0eb1716ca7e2974f",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "■ STOP",
     "props": [
       {
@@ -84,14 +414,14 @@
     "y": 200,
     "wires": [
       [
-        "fn"
+        "5144fef5d4ec1329"
       ]
     ]
   },
   {
-    "id": "a4",
+    "id": "56738ea1c05b8ab3",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Stop al iniciar",
     "props": [
       {
@@ -109,14 +439,14 @@
     "y": 260,
     "wires": [
       [
-        "fn"
+        "5144fef5d4ec1329"
       ]
     ]
   },
   {
-    "id": "fn",
+    "id": "5144fef5d4ec1329",
     "type": "function",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Motores",
     "func": "// Velocidad 0..100 (% de PWM). Con batería de 9 V y motor de 6 V, no pasar de ~70.\nconst SPEED = Number(msg.speed ?? 30);\nlet dir;\nswitch (msg.payload) {\n    case \"adelante\": dir = 0; break;\n    case \"atras\":    dir = 1; break;\n    default:         // stop\n        node.status({fill:\"red\",shape:\"dot\",text:\"stop\"});\n        return [{payload:0},{payload:0},{payload:0},{payload:0},{payload:0},{payload:0}];\n}\nnode.status({fill:\"green\",shape:\"dot\",text:msg.payload+\" \"+SPEED+\"%\"});\n// [Izq PWM, Izq 1, Izq 2, Der PWM, Der 1, Der 2]\nreturn [{payload:SPEED},{payload:dir},{payload:dir?0:1},\n        {payload:SPEED},{payload:dir},{payload:dir?0:1}];",
     "outputs": 6,
@@ -129,30 +459,30 @@
     "y": 170,
     "wires": [
       [
-        "p1",
-        "d1"
+        "70fab90c8256b0b5",
+        "8077b9fcaa8ffeda"
       ],
       [
-        "p2"
+        "a422a8c9846b89fe"
       ],
       [
-        "p3"
+        "d0e7e9b709e6191b"
       ],
       [
-        "p4"
+        "d16bc153fa32c4d4"
       ],
       [
-        "p5"
+        "c68f7b34436f767a"
       ],
       [
-        "p6"
+        "e214f353dc3fb105"
       ]
     ]
   },
   {
-    "id": "p1",
+    "id": "70fab90c8256b0b5",
     "type": "pi-gpiod out",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Izq PWM (BCM24)",
     "host": "localhost",
     "port": 8888,
@@ -168,9 +498,9 @@
     "wires": []
   },
   {
-    "id": "p2",
+    "id": "a422a8c9846b89fe",
     "type": "pi-gpiod out",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Izq 1 (BCM17)",
     "host": "localhost",
     "port": 8888,
@@ -186,9 +516,9 @@
     "wires": []
   },
   {
-    "id": "p3",
+    "id": "d0e7e9b709e6191b",
     "type": "pi-gpiod out",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Izq 2 (BCM4)",
     "host": "localhost",
     "port": 8888,
@@ -204,9 +534,9 @@
     "wires": []
   },
   {
-    "id": "p4",
+    "id": "d16bc153fa32c4d4",
     "type": "pi-gpiod out",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Der PWM (BCM14)",
     "host": "localhost",
     "port": 8888,
@@ -222,9 +552,9 @@
     "wires": []
   },
   {
-    "id": "p5",
+    "id": "c68f7b34436f767a",
     "type": "pi-gpiod out",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Der 1 (BCM10)",
     "host": "localhost",
     "port": 8888,
@@ -240,9 +570,9 @@
     "wires": []
   },
   {
-    "id": "p6",
+    "id": "e214f353dc3fb105",
     "type": "pi-gpiod out",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Der 2 (BCM25)",
     "host": "localhost",
     "port": 8888,
@@ -258,9 +588,9 @@
     "wires": []
   },
   {
-    "id": "d1",
+    "id": "8077b9fcaa8ffeda",
     "type": "debug",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "PWM enviado",
     "active": true,
     "tosidebar": true,
@@ -275,9 +605,9 @@
     "wires": []
   },
   {
-    "id": "srv_iz",
+    "id": "ce7d518130f4c00d",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "↰ Izquierda",
     "props": [
       {
@@ -295,14 +625,14 @@
     "y": 360,
     "wires": [
       [
-        "srv_out"
+        "f72acdb178af541a"
       ]
     ]
   },
   {
-    "id": "srv_ce",
+    "id": "d10377d494bc9180",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "↑ Centro",
     "props": [
       {
@@ -320,14 +650,14 @@
     "y": 400,
     "wires": [
       [
-        "srv_out"
+        "f72acdb178af541a"
       ]
     ]
   },
   {
-    "id": "srv_de",
+    "id": "fc1b8ca596bd50f5",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "↱ Derecha",
     "props": [
       {
@@ -345,14 +675,14 @@
     "y": 440,
     "wires": [
       [
-        "srv_out"
+        "f72acdb178af541a"
       ]
     ]
   },
   {
-    "id": "srv_ini",
+    "id": "fb01096100f08f04",
     "type": "inject",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Centrar al iniciar",
     "props": [
       {
@@ -370,14 +700,14 @@
     "y": 480,
     "wires": [
       [
-        "srv_out"
+        "f72acdb178af541a"
       ]
     ]
   },
   {
-    "id": "srv_out",
+    "id": "f72acdb178af541a",
     "type": "pi-gpiod out",
-    "z": "avanzar",
+    "z": "891dd4f4bea18605",
     "name": "Servo dirección",
     "host": "localhost",
     "port": 8888,
@@ -393,9 +723,94 @@
     "wires": []
   },
   {
+    "id": "a2a72e6aee02cff1",
+    "type": "mqtt in",
+    "z": "57b332e36ceceea9",
+    "name": "Resultados de vision.py",
+    "topic": "robot/vision",
+    "qos": "0",
+    "datatype": "utf8",
+    "broker": "vision-broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 190,
+    "y": 120,
+    "wires": [
+      [
+        "94881a6586df55b1"
+      ]
+    ]
+  },
+  {
+    "id": "94881a6586df55b1",
+    "type": "json",
+    "z": "57b332e36ceceea9",
+    "name": "Decodificar JSON",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 400,
+    "y": 120,
+    "wires": [
+      [
+        "6f14ca56b0b07cf8"
+      ]
+    ]
+  },
+  {
+    "id": "6f14ca56b0b07cf8",
+    "type": "function",
+    "z": "57b332e36ceceea9",
+    "name": "Guardar estado de visión",
+    "func": "const p = msg.payload;\nif (!p || typeof p !== \"object\" || typeof p.detectado !== \"boolean\" || typeof p.modo !== \"string\") {\n    node.warn(\"Mensaje de visión inválido; se esperaba un objeto JSON con detectado y modo\");\n    return null;\n}\nconst x = Number.isFinite(p.x) ? Math.max(0, Math.min(1, p.x)) : null;\nconst area = Number.isFinite(p.area) ? Math.max(0, p.area) : null;\nconst anterior = global.get(\"robot_vision\");\nconst recibido = Date.now();\nconst mensajesRecientes = anterior && Number.isFinite(anterior.recibido) && recibido - anterior.recibido < 300\n    ? Math.min(3, (Number(anterior.mensajes_recientes) || 1) + 1) : 1;\nconst ultimoDetectado = p.detectado && x !== null ? recibido : (anterior && Number.isFinite(anterior.ultimo_detectado) ? anterior.ultimo_detectado : null);\nconst ultimaX = p.detectado && x !== null ? x : (anterior && Number.isFinite(anterior.ultima_x) ? anterior.ultima_x : null);\nglobal.set(\"robot_vision\", {\n    activo: true,\n    detectado: p.detectado,\n    modo: p.modo,\n    x,\n    area,\n    texto: typeof p.texto === \"string\" ? p.texto : null,\n    recibido,\n    ultimo_detectado: ultimoDetectado,\n    ultima_x: ultimaX,\n    mensajes_recientes: mensajesRecientes\n});\nnode.status({ fill: p.detectado ? \"green\" : \"grey\", shape: \"dot\", text: p.modo + (p.detectado ? \" detectado\" : \" sin objeto\") });\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 630,
+    "y": 120,
+    "wires": [
+      [
+        "77ec0de63b4058b3",
+        "vision-follow-out"
+      ]
+    ]
+  },
+  {
+    "id": "77ec0de63b4058b3",
+    "type": "debug",
+    "z": "57b332e36ceceea9",
+    "name": "Deteccion recibida",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload.detectado",
+    "statusType": "msg",
+    "x": 850,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "b020b1ba5579ae4f",
+    "type": "global-config",
+    "env": [],
+    "modules": {
+      "@flowfuse/node-red-dashboard": "1.33.0",
+      "node-red-node-pi-gpiod": "0.5.1",
+      "node-red-node-pisrf": "0.4.0"
+    }
+  },
+  {
     "id": "d_c1",
     "type": "comment",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Abrir en el navegador:  http://<IP-del-robot>:1880/robot",
     "info": "Desde la Raspberry: http://localhost:1880/robot\nDesde otra compu o celular en la misma red: http://ROBOT-06.local:1880/robot (o con la IP: hostname -I)",
     "x": 250,
@@ -405,7 +820,7 @@
   {
     "id": "d_get",
     "type": "http in",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "GET /robot",
     "url": "/robot",
     "method": "get",
@@ -422,13 +837,13 @@
   {
     "id": "d_tpl",
     "type": "template",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Página del tablero",
     "field": "payload",
     "fieldType": "msg",
     "format": "html",
     "syntax": "plain",
-    "template": "<!doctype html>\n<html lang=\"es\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#20272b\">\n<title>Robot 06</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700;800&display=swap\" rel=\"stylesheet\">\n<style>\n  :root {\n    --asfalto: #20272b;\n    --asfalto-2: #2a3338;\n    --asfalto-3: #36424a;\n    --linea: #f2c12e;\n    --tiza: #eef1ef;\n    --gris: #93a1a8;\n    --freno: #e23d3d;\n    --verde: #34c77b;\n    --reversa: #cfe3f0;\n    --cond: \"Barlow Condensed\", \"Arial Narrow\", system-ui, sans-serif;\n    --body: \"Barlow\", system-ui, sans-serif;\n    --joy: min(62vh, 360px);\n  }\n  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }\n  html, body { margin: 0; height: 100%; background: var(--asfalto); color: var(--tiza); font-family: var(--body); }\n  body {\n    user-select: none; -webkit-user-select: none; overflow: hidden;\n    background-image: radial-gradient(rgba(255,255,255,.035) 1px, transparent 1px);\n    background-size: 5px 5px;\n    padding: max(14px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))\n             max(14px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));\n    display: flex; flex-direction: column;\n  }\n  button, input { font: inherit; }\n  :focus-visible { outline: 3px solid var(--linea); outline-offset: 3px; }\n\n  /* ---------- Barra superior ---------- */\n  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }\n  h1 { font-family: var(--cond); font-weight: 800; font-size: 28px; margin: 0; line-height: 1; }\n  h1 small { font-weight: 600; color: var(--gris); font-size: 16px; margin-left: 4px; }\n  .vmax { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 360px; }\n  .vmax label { font-family: var(--cond); font-weight: 600; font-size: 16px; color: var(--gris); white-space: nowrap; }\n  .vmax output { font-family: var(--cond); font-weight: 700; font-size: 18px; min-width: 42px; text-align: right; }\n  #conn { font-size: 13px; color: var(--gris); display: flex; align-items: center; gap: 6px; white-space: nowrap; }\n  #conn::before { content: \"\"; width: 8px; height: 8px; border-radius: 50%; background: var(--verde); }\n  #conn.off { color: var(--freno); }\n  #conn.off::before { background: var(--freno); }\n\n  input[type=range] {\n    -webkit-appearance: none; appearance: none; flex: 1; height: 28px; border-radius: 6px; cursor: pointer;\n    background:\n      repeating-linear-gradient(90deg, var(--linea) 0 12px, transparent 12px 22px) center / 100% 3px no-repeat,\n      var(--asfalto-2);\n    box-shadow: inset 0 0 0 2px var(--asfalto-3);\n  }\n  input[type=range]::-webkit-slider-thumb {\n    -webkit-appearance: none; width: 20px; height: 32px; border-radius: 5px;\n    background: var(--tiza); border: 3px solid var(--asfalto);\n  }\n  input[type=range]::-moz-range-thumb { width: 16px; height: 28px; border-radius: 5px; background: var(--tiza); border: 3px solid var(--asfalto); }\n\n  /* ---------- Cabina apaisada ---------- */\n  .cabina {\n    flex: 1; min-height: 0;\n    display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; gap: 24px;\n  }\n\n  /* Joystick */\n  .joy-zona { display: grid; place-items: center; }\n  #joy { position: relative; width: var(--joy); height: var(--joy); touch-action: none; cursor: grab; }\n  #joy:active { cursor: grabbing; }\n  #joy svg { position: absolute; inset: 0; width: 100%; height: 100%; }\n  #joy .aro { fill: rgba(0,0,0,.18); stroke: var(--asfalto-3); stroke-width: 1.5; }\n  #joy .cruz { stroke: var(--asfalto-3); stroke-width: 1.5; stroke-dasharray: 4 5; }\n  #joy .zona { fill: none; stroke: var(--asfalto-3); stroke-width: 1; }\n  #joy text { fill: var(--gris); font-family: var(--body); font-weight: 600; font-size: 12px; }\n  #knob {\n    position: absolute; left: 50%; top: 50%; width: 30%; height: 30%;\n    margin: -15% 0 0 -15%; border-radius: 50%;\n    background: radial-gradient(circle at 38% 32%, #3c4950, var(--asfalto-2) 70%);\n    border: 3px solid var(--linea);\n    box-shadow: 0 6px 16px rgba(0,0,0,.45);\n    transition: transform .16s ease-out, border-color .15s;\n    pointer-events: none;\n  }\n  #joy.activo #knob { transition: border-color .15s; }\n  #joy.d #knob { border-color: var(--verde); }\n  #joy.r #knob { border-color: var(--reversa); }\n\n  /* Velocímetro central */\n  .tablero { width: min(64vh, 340px); margin: 0 auto; }\n  .gauge { width: 100%; display: block; }\n  .gauge .pista { stroke: var(--asfalto-3); }\n  .gauge .valor { stroke: var(--linea); transition: stroke-dashoffset .2s ease; }\n  .gauge .marca { stroke: var(--gris); }\n  .gauge text { fill: var(--gris); font-family: var(--cond); font-size: 14px; font-weight: 600; }\n  .gauge #marcha { font-family: var(--cond); font-weight: 800; font-size: 80px; fill: var(--tiza); transition: fill .15s; }\n  .gauge #marchaTxt { font-family: var(--body); font-weight: 500; font-size: 15px; fill: var(--gris); }\n  .gauge .vel { font-family: var(--cond); font-weight: 700; font-size: 28px; fill: var(--tiza); }\n  .gauge .vel .pct { font-size: 18px; fill: var(--gris); }\n  #giroTxt { text-align: center; margin-top: 10px; font-family: var(--cond); font-weight: 600; font-size: 18px; color: var(--gris); }\n\n  .dist {\n    display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px auto 0;\n    width: fit-content; padding: 6px 14px; border-radius: 999px; background: var(--asfalto-2);\n    font-family: var(--cond); font-weight: 600; font-size: 18px; color: var(--gris);\n    transition: background .15s, color .15s;\n  }\n  .dist b { color: var(--tiza); font-weight: 700; }\n  .dist.cerca { background: var(--freno); color: #fff; }\n  .dist.cerca b { color: #fff; }\n  .camara {\n    width: min(100%, 340px); margin: 12px auto 0; padding: 8px 10px;\n    border: 1px solid var(--asfalto-3); border-radius: 10px; background: var(--asfalto-2);\n  }\n  .camara-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 13px; }\n  .camara-cabecera strong { font-family: var(--cond); font-size: 16px; }\n  #camaraEstado { color: var(--gris); font-size: 11px; text-align: right; }\n  .camara-controles { display: flex; gap: 6px; }\n  #camaraUrl { min-width: 0; flex: 1; padding: 6px 8px; border: 1px solid var(--asfalto-3); border-radius: 5px; background: var(--asfalto); color: var(--tiza); font-size: 11px; }\n  .camara-controles button { padding: 5px 8px; border: 0; border-radius: 5px; background: var(--linea); color: var(--asfalto); font-weight: 700; font-size: 11px; cursor: pointer; }\n  #camaraImagen { display: block; width: 100%; aspect-ratio: 4 / 3; margin-top: 7px; border-radius: 6px; background: #101416; object-fit: contain; }\n  #camaraImagen[hidden] { display: none; }\n  .vision {\n    width: min(100%, 340px); margin: 10px auto 0; padding: 8px 12px;\n    border: 1px solid var(--asfalto-3); border-radius: 10px; background: var(--asfalto-2);\n    font-size: 13px;\n  }\n  .vision-cabecera, .vision-detalle { display: flex; align-items: center; gap: 8px; }\n  .vision-cabecera { min-height: 18px; }\n  .vision-cabecera strong { flex: 1; }\n  .vision-cabecera small { color: var(--gris); }\n  .vision-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: var(--gris); }\n  .vision.activa .vision-dot { background: var(--verde); }\n  .vision.detectada .vision-dot { background: var(--linea); }\n  .vision.detalle-off .vision-dot { background: var(--freno); }\n  .vision-detalle { justify-content: space-between; margin-top: 5px; color: var(--gris); }\n  .vision-detalle b { color: var(--tiza); font-weight: 600; }\n  #visionTexto { max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .vision-track { position: relative; height: 5px; margin-top: 8px; border-radius: 5px; background: var(--asfalto-3); }\n  .vision-marca { position: absolute; top: 50%; width: 11px; height: 11px; border: 2px solid var(--asfalto-2); border-radius: 50%; background: var(--linea); transform: translate(-50%, -50%); }\n  .vision-marca.oculta { display: none; }\n  .ayuda { font-size: 12px; color: var(--gris); text-align: center; line-height: 1.8; margin: 14px 0 0; }\n  kbd { font-family: var(--body); font-size: 11px; background: var(--asfalto-2); border-radius: 4px; padding: 1px 5px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.3); color: var(--tiza); }\n  @media (hover: none) { .ayuda { display: none; } }\n\n  /* Aviso para girar el celular */\n  .girar { display: none; }\n  @media (orientation: portrait) and (max-width: 700px) {\n    .cabina { display: none; }\n    header .vmax { display: none; }\n    .girar { display: grid; place-items: center; flex: 1; text-align: center; color: var(--gris); gap: 12px; }\n    .girar b { font-family: var(--cond); font-size: 26px; color: var(--tiza); display: block; }\n  }\n  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }\n</style>\n</head>\n<body>\n<header>\n  <h1>Robot <small>06</small></h1>\n  <div class=\"vmax\">\n    <label for=\"speed\">Velocidad máxima</label>\n    <input type=\"range\" id=\"speed\" min=\"40\" max=\"80\" step=\"5\" value=\"60\">\n    <output id=\"vMax\" for=\"speed\">60 %</output>\n  </div>\n  <span id=\"conn\">Conectado</span>\n</header>\n\n<div class=\"cabina\">\n  <!-- Joystick -->\n  <div class=\"joy-zona\">\n    <div id=\"joy\" role=\"application\" aria-label=\"Joystick: arriba adelante, abajo atrás, costados para doblar\">\n      <svg viewBox=\"0 0 200 200\" aria-hidden=\"true\">\n        <circle class=\"aro\" cx=\"100\" cy=\"100\" r=\"96\"/>\n        <circle class=\"zona\" cx=\"100\" cy=\"100\" r=\"15\"/>\n        <line class=\"cruz\" x1=\"100\" y1=\"28\" x2=\"100\" y2=\"172\"/>\n        <line class=\"cruz\" x1=\"28\" y1=\"100\" x2=\"172\" y2=\"100\"/>\n        <text x=\"100\" y=\"20\" text-anchor=\"middle\">adelante</text>\n        <text x=\"100\" y=\"190\" text-anchor=\"middle\">atrás</text>\n        <text x=\"12\" y=\"104\">izq</text>\n        <text x=\"188\" y=\"104\" text-anchor=\"end\">der</text>\n      </svg>\n      <div id=\"knob\"></div>\n    </div>\n  </div>\n\n  <!-- Velocímetro -->\n  <div>\n    <div class=\"tablero\">\n      <svg class=\"gauge\" viewBox=\"0 0 300 200\" aria-hidden=\"true\">\n        <path class=\"pista\" d=\"M 40 170 A 115 115 0 1 1 260 170\" fill=\"none\" stroke-width=\"14\" stroke-linecap=\"round\"/>\n        <path id=\"arco\" class=\"valor\" d=\"M 40 170 A 115 115 0 1 1 260 170\" fill=\"none\" stroke-width=\"14\" stroke-linecap=\"round\"/>\n        <g id=\"marcas\"></g>\n        <text id=\"marcha\" x=\"150\" y=\"128\" text-anchor=\"middle\">N</text>\n        <text id=\"marchaTxt\" x=\"150\" y=\"152\" text-anchor=\"middle\">Detenido</text>\n        <text class=\"vel\" x=\"150\" y=\"190\" text-anchor=\"middle\"><tspan id=\"vSpeed\">0</tspan><tspan class=\"pct\"> %</tspan></text>\n    </div>\n    <div id=\"giroTxt\">Recto</div>\n    <div class=\"dist\" id=\"dist\">Obstáculo <b id=\"distCm\">sin lectura</b></div>\n    <section class=\"camara\" aria-label=\"Video en vivo de la cámara del celular\">\n      <div class=\"camara-cabecera\"><strong>Cámara en vivo</strong><span id=\"camaraEstado\">Configurar URL del celular</span></div>\n      <form class=\"camara-controles\" id=\"camaraForm\">\n        <input id=\"camaraUrl\" type=\"url\" inputmode=\"url\" placeholder=\"http://IP_DEL_CELULAR:8080/video\" aria-label=\"URL del video del celular\" autocomplete=\"url\">\n        <button type=\"submit\">Conectar</button>\n        <button type=\"button\" id=\"camaraQuitar\">Quitar</button>\n      </form>\n      <img id=\"camaraImagen\" alt=\"Video en vivo del celular\" hidden>\n    </section>\n    <section class=\"vision detalle-off\" id=\"vision\" aria-live=\"polite\" aria-label=\"Estado de la cámara\">\n      <div class=\"vision-cabecera\"><span class=\"vision-dot\"></span><strong id=\"visionEstado\">Cámara sin señal</strong><small id=\"visionModo\">—</small></div>\n      <div class=\"vision-detalle\"><span>Objeto</span><b id=\"visionObjeto\">—</b><span>Posición</span><b id=\"visionPos\">—</b><b id=\"visionTexto\"></b></div>\n      <div class=\"vision-detalle\"><span>Área de imagen</span><b id=\"visionArea\">—</b></div>\n      <div class=\"vision-track\" aria-label=\"Posición horizontal\"><span class=\"vision-marca oculta\" id=\"visionMarca\"></span></div>\n    </section>\n    <p class=\"ayuda\">\n      <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> o flechas para manejar, <kbd>Espacio</kbd> frena\n    </p>\n  </div>\n\n</div>\n\n<div class=\"girar\"><div><b>Girá el celular</b>El tablero se usa en horizontal</div></div>\n\n<script>\nconst URL_CMD = location.pathname.replace(/\\/$/, \"\") + \"/cmd\";\nconst URL_ESTADO = location.pathname.replace(/\\/$/, \"\") + \"/estado\";\nconst $ = id => document.getElementById(id);\nconst VEL_MIN = 45;     // por debajo de esto el motor no arranca\nconst ZONA_MUERTA = 0.15;\nconst MAX_ESCALA = 80;\n\n// ---------- Velocímetro ----------\nconst arco = $(\"arco\");\nconst LARGO = arco.getTotalLength();\narco.style.strokeDasharray = LARGO;\n(function () {\n  const g = $(\"marcas\"), cx = 150, cy = 136.5, r = 115;\n  for (let v = 0; v <= MAX_ESCALA; v += 20) {\n    const a = (163 + (v / MAX_ESCALA) * 214) * Math.PI / 180;\n    const p = k => [cx + Math.cos(a) * (r - k), cy + Math.sin(a) * (r - k)];\n    const [x1, y1] = p(14), [x2, y2] = p(24), [tx, ty] = p(40);\n    g.insertAdjacentHTML(\"beforeend\",\n      `<line class=\"marca\" x1=\"${x1}\" y1=\"${y1}\" x2=\"${x2}\" y2=\"${y2}\" stroke-width=\"2\"/>` +\n      (v === 40 ? \"\" : `<text x=\"${tx}\" y=\"${ty + 4}\" text-anchor=\"middle\">${v}</text>`));\n  }\n})();\n\n// ---------- Comunicación ----------\nlet last = 0, pending = null;\nfunction send(data) {\n  return fetch(URL_CMD, { method: \"POST\", headers: { \"Content-Type\": \"application/json\" }, body: JSON.stringify(data) })\n    .then(r => r.json()).then(st => { pintar(st); conectado(true); })\n    .catch(() => conectado(false));\n}\nfunction sendThrottled(data) {\n  const now = Date.now();\n  clearTimeout(pending);\n  if (now - last > 80) { last = now; send(data); }\n  else pending = setTimeout(() => { last = Date.now(); send(data); }, 80);\n}\nfunction sendYa(data) { clearTimeout(pending); last = Date.now(); send(data); }\nfunction conectado(ok) {\n  $(\"conn\").classList.toggle(\"off\", !ok);\n  $(\"conn\").textContent = ok ? \"Conectado\" : \"Sin conexión con Node-RED\";\n}\n\n// ---------- Pantalla ----------\nconst MARCHAS = {\n  adelante: { l: \"D\", t: \"Adelante\", c: \"var(--verde)\" },\n  atras:    { l: \"R\", t: \"Atrás\",    c: \"var(--reversa)\" },\n  stop:     { l: \"N\", t: \"Detenido\", c: \"var(--tiza)\" }\n};\nfunction pintarDist(st) {\n  const d = st.distancia, cerca = st.cerca;\n  $(\"dist\").classList.toggle(\"cerca\", !!cerca);\n  if (d === null || d === undefined) { $(\"dist\").innerHTML = 'Obstáculo <b>sin lectura</b>'; return; }\n  $(\"dist\").innerHTML = (cerca ? \"Muy cerca, no avanza: \" : \"Obstáculo a \") + `<b>${Math.round(d)} cm</b>`;\n}\nfunction pintarVision(v) {\n  v = v || {};\n  const panel = $(\"vision\");\n  const activo = v.activo === true;\n  const detectado = activo && v.detectado === true;\n  panel.classList.toggle(\"activa\", activo && !detectado);\n  panel.classList.toggle(\"detectada\", detectado);\n  panel.classList.toggle(\"detalle-off\", !activo);\n  $(\"visionEstado\").textContent = !activo ? \"Cámara sin señal\" : (detectado ? \"Objeto detectado\" : \"Sin objeto\");\n  $(\"visionModo\").textContent = activo && v.modo ? \"Modo \" + v.modo : \"—\";\n  $(\"visionObjeto\").textContent = !activo ? \"—\" : (detectado ? \"Sí\" : \"No\");\n  const x = Number.isFinite(v.x) ? Math.max(0, Math.min(1, v.x)) : null;\n  $(\"visionPos\").textContent = !detectado ? \"—\" : x === null ? \"detectado\" :\n    (x < 0.4 ? \"izquierda\" : x > 0.6 ? \"derecha\" : \"centro\");\n  $(\"visionTexto\").textContent = activo && typeof v.texto === \"string\" ? v.texto : \"\";\n  $(\"visionArea\").textContent = detectado && Number.isFinite(v.area) ? (v.area * 100).toFixed(2) + \"%\" : \"—\";\n  const marca = $(\"visionMarca\");\n  marca.classList.toggle(\"oculta\", !detectado || x === null);\n  if (x !== null) marca.style.left = (x * 100) + \"%\";\n}\nconst CAMARA_STORAGE_KEY = \"raspirobot-camara-url\";\nconst camaraImagen = $(\"camaraImagen\");\nconst camaraEstado = $(\"camaraEstado\");\nfunction conectarCamara(rawUrl) {\n  let url;\n  try { url = new URL(rawUrl); }\n  catch { camaraEstado.textContent = \"Ingresá una URL válida\"; return; }\n  if (!([\"http:\", \"https:\"].includes(url.protocol)) || !url.hostname) {\n    camaraEstado.textContent = \"Usá una URL HTTP o HTTPS\";\n    return;\n  }\n  $(\"camaraUrl\").value = url.href;\n  localStorage.setItem(CAMARA_STORAGE_KEY, url.href);\n  camaraImagen.hidden = false;\n  camaraEstado.textContent = \"Conectando…\";\n  camaraImagen.src = url.href;\n}\n$(\"camaraForm\").addEventListener(\"submit\", e => {\n  e.preventDefault();\n  conectarCamara($(\"camaraUrl\").value.trim());\n});\n$(\"camaraQuitar\").addEventListener(\"click\", () => {\n  localStorage.removeItem(CAMARA_STORAGE_KEY);\n  camaraImagen.removeAttribute(\"src\");\n  camaraImagen.hidden = true;\n  camaraEstado.textContent = \"Configurar URL del celular\";\n});\ncamaraImagen.addEventListener(\"load\", () => { camaraEstado.textContent = \"En vivo\"; });\ncamaraImagen.addEventListener(\"error\", () => { camaraEstado.textContent = \"No se pudo abrir el video\"; });\nconst camaraGuardada = localStorage.getItem(CAMARA_STORAGE_KEY);\nif (camaraGuardada) conectarCamara(camaraGuardada);\n\nfunction pintar(st) {\n  pintarDist(st);\n  pintarVision(st.vision);\n  const m = MARCHAS[st.cmd];\n  $(\"marcha\").textContent = m.l; $(\"marcha\").style.fill = m.c; $(\"marchaTxt\").textContent = m.t;\n  const v = st.cmd === \"stop\" ? 0 : st.speed;\n  $(\"vSpeed\").textContent = v;\n  arco.style.strokeDashoffset = LARGO * (1 - v / MAX_ESCALA);\n  const s = st.steer;\n  $(\"giroTxt\").textContent = s === 0 ? \"Recto\" : (s < 0 ? `Izquierda ${-s} %` : `Derecha ${s} %`);\n  $(\"joy\").classList.toggle(\"d\", st.cmd === \"adelante\");\n  $(\"joy\").classList.toggle(\"r\", st.cmd === \"atras\");\n}\n\n// ---------- Joystick: (x, y) en -1..1 → comando ----------\nfunction aplicar(x, y) {\n  const steer = Math.round(x * 100);\n  const vmax = Number($(\"speed\").value);\n  const mag = Math.abs(y);\n  if (mag < ZONA_MUERTA) return { cmd: \"stop\", steer };\n  const t = (mag - ZONA_MUERTA) / (1 - ZONA_MUERTA);\n  const speed = Math.round(VEL_MIN + t * (vmax - VEL_MIN));\n  return { cmd: y < 0 ? \"adelante\" : \"atras\", speed, steer };\n}\nfunction moverKnob(x, y) {\n  $(\"knob\").style.transform = `translate(${x * 100}%, ${y * 100}%)`;\n}\n\nconst joy = $(\"joy\");\nlet activo = false;\nfunction leer(e) {\n  const r = joy.getBoundingClientRect();\n  let x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2 * 0.6);\n  let y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2 * 0.6);\n  const d = Math.hypot(x, y);\n  if (d > 1) { x /= d; y /= d; }\n  return [x, y];\n}\njoy.addEventListener(\"pointerdown\", e => {\n  joy.setPointerCapture(e.pointerId); activo = true; joy.classList.add(\"activo\");\n  const [x, y] = leer(e); moverKnob(x, y); sendThrottled(aplicar(x, y));\n});\njoy.addEventListener(\"pointermove\", e => {\n  if (!activo) return;\n  const [x, y] = leer(e); moverKnob(x, y); sendThrottled(aplicar(x, y));\n});\nfunction soltarJoy() {\n  if (!activo) return;\n  activo = false; joy.classList.remove(\"activo\");\n  moverKnob(0, 0); sendYa({ cmd: \"stop\", steer: 0 });\n}\njoy.addEventListener(\"pointerup\", soltarJoy);\njoy.addEventListener(\"pointercancel\", soltarJoy);\n\nfunction frenar() { moverKnob(0, 0); sendYa({ cmd: \"stop\", steer: 0 }); }\n\n$(\"speed\").addEventListener(\"input\", e => { $(\"vMax\").textContent = e.target.value + \" %\"; });\n\n// ---------- Teclado: mismo joystick ----------\nconst k = { up: false, down: false, left: false, right: false };\nconst MAPA = { w: \"up\", arrowup: \"up\", s: \"down\", arrowdown: \"down\", a: \"left\", arrowleft: \"left\", d: \"right\", arrowright: \"right\" };\nfunction desdeTeclas() {\n  const x = (k.right ? 1 : 0) - (k.left ? 1 : 0);\n  const y = (k.down ? 1 : 0) - (k.up ? 1 : 0);\n  moverKnob(x * (y ? .707 : 1), y * (x ? .707 : 1));\n  sendYa(aplicar(x, y));\n}\ndocument.addEventListener(\"keydown\", e => {\n  if (e.target.tagName === \"INPUT\") return;\n  const key = e.key.toLowerCase();\n  if (key === \" \") { e.preventDefault(); frenar(); return; }\n  const dir = MAPA[key];\n  if (!dir || e.repeat) return;\n  e.preventDefault(); k[dir] = true; desdeTeclas();\n});\ndocument.addEventListener(\"keyup\", e => {\n  const dir = MAPA[e.key.toLowerCase()];\n  if (!dir) return;\n  k[dir] = false; desdeTeclas();\n});\nwindow.addEventListener(\"blur\", () => { Object.keys(k).forEach(n => k[n] = false); frenar(); });\n\nsend({ cmd: \"stop\", steer: 0 });\n\n// Leer distancia y estado cada 300 ms (sin mandar órdenes)\nsetInterval(() => {\n  fetch(URL_ESTADO).then(r => r.json()).then(st => { pintar(st); conectado(true); }).catch(() => conectado(false));\n}, 300);\n</script>\n</body>\n</html>\n",
+    "template": "<!doctype html>\n<html lang=\"es\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#04122b\">\n<title>Robot 06</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700;800&display=swap\" rel=\"stylesheet\">\n<style>\n  :root {\n    --asfalto: #04122b;      /* azul noche */\n    --asfalto-2: #0a2149;\n    --asfalto-3: #17366d;\n    --linea: #ff5fb8;        /* rosa */\n    --azul: #0093cc;         /* azul Alpine */\n    --azul-2: #2fb4ff;\n    --tiza: #f4f7fb;\n    --gris: #8fa6c8;\n    --freno: #ff2d55;\n    --verde: #2ee38a;\n    --amarillo: #ffd23f;\n    --reversa: #ffd23f;\n    --cond: \"Barlow Condensed\", \"Arial Narrow\", system-ui, sans-serif;\n    --body: \"Barlow\", system-ui, sans-serif;\n    --joy: min(58vh, 340px);\n  }\n  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }\n  html, body { margin: 0; height: 100%; background: var(--asfalto); color: var(--tiza); font-family: var(--body); }\n  body {\n    user-select: none; -webkit-user-select: none; overflow-x: hidden; overflow-y: auto;\n    background:\n      linear-gradient(115deg, transparent 0 62%, rgba(0,147,204,.10) 62% 70%, rgba(255,95,184,.10) 70% 74%, transparent 74%),\n      radial-gradient(1200px 600px at 10% -10%, rgba(0,147,204,.28), transparent 60%),\n      radial-gradient(900px 500px at 110% 110%, rgba(255,95,184,.18), transparent 60%),\n      var(--asfalto);\n    padding: max(14px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))\n             max(14px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));\n    display: flex; flex-direction: column;\n  }\n  button, input { font: inherit; }\n  :focus-visible { outline: 3px solid var(--linea); outline-offset: 3px; }\n\n  /* ---------- Barra superior ---------- */\n  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 10px; position: relative; }\n  header::after { content: \"\"; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; border-radius: 4px;\n    background: linear-gradient(90deg, var(--azul) 0 55%, var(--tiza) 55% 58%, var(--linea) 58% 100%); }\n  h1 { font-family: var(--cond); font-weight: 800; font-size: 28px; margin: 0; line-height: 1; }\n  h1 { font-style: italic; letter-spacing: .5px; }\n  h1 small { font-weight: 700; color: var(--linea); font-size: 18px; margin-left: 4px; }\n  .vmax { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 360px; }\n  .vmax label { font-family: var(--cond); font-weight: 600; font-size: 16px; color: var(--gris); white-space: nowrap; }\n  .vmax output { font-family: var(--cond); font-weight: 700; font-size: 18px; min-width: 42px; text-align: right; }\n  #conn { font-size: 13px; color: var(--gris); display: flex; align-items: center; gap: 6px; white-space: nowrap; }\n  #conn::before { content: \"\"; width: 8px; height: 8px; border-radius: 50%; background: var(--verde); }\n  #conn.off { color: var(--freno); }\n  #conn.off::before { background: var(--freno); }\n\n  input[type=range] {\n    -webkit-appearance: none; appearance: none; flex: 1; height: 28px; border-radius: 6px; cursor: pointer;\n    background:\n      linear-gradient(90deg, var(--azul), var(--linea)) center / 100% 4px no-repeat,\n      var(--asfalto-2);\n    box-shadow: inset 0 0 0 2px var(--asfalto-3);\n  }\n  input[type=range]::-webkit-slider-thumb {\n    -webkit-appearance: none; width: 20px; height: 32px; border-radius: 5px;\n    background: var(--tiza); border: 3px solid var(--linea);\n  }\n  input[type=range]::-moz-range-thumb { width: 16px; height: 28px; border-radius: 5px; background: var(--tiza); border: 3px solid var(--asfalto); }\n\n  /* ---------- Cabina apaisada ---------- */\n  .cabina {\n    flex: 1; min-height: 0;\n    display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; gap: 24px;\n  }\n\n  /* Joystick */\n  .joy-zona { display: grid; place-items: center; }\n  #joy { position: relative; width: var(--joy); height: var(--joy); touch-action: none; cursor: grab; }\n  #joy:active { cursor: grabbing; }\n  #joy svg { position: absolute; inset: 0; width: 100%; height: 100%; }\n  #joy .aro { fill: rgba(0,147,204,.10); stroke: var(--azul); stroke-width: 2; }\n  #joy .cruz { stroke: rgba(47,180,255,.45); stroke-width: 1.5; stroke-dasharray: 4 5; }\n  #joy .zona { fill: none; stroke: var(--linea); stroke-width: 1; }\n  #joy text { fill: var(--gris); font-family: var(--body); font-weight: 600; font-size: 12px; }\n  #knob {\n    position: absolute; left: 50%; top: 50%; width: 30%; height: 30%;\n    margin: -15% 0 0 -15%; border-radius: 50%;\n    background: radial-gradient(circle at 38% 32%, #2a5aa8, var(--asfalto-2) 72%);\n    border: 3px solid var(--linea);\n    box-shadow: 0 6px 18px rgba(0,0,0,.5), 0 0 18px rgba(255,95,184,.35);\n    transition: transform .16s ease-out, border-color .15s;\n    pointer-events: none;\n  }\n  #joy.activo #knob { transition: border-color .15s; }\n  #joy.d #knob { border-color: var(--verde); }\n  #joy.r #knob { border-color: var(--reversa); }\n\n  /* Velocímetro central */\n  .tablero { width: min(64vh, 340px); margin: 0 auto; }\n  .gauge { width: 100%; display: block; }\n  .gauge .pista { stroke: var(--asfalto-3); }\n  .gauge .valor { stroke: url(#grad); transition: stroke-dashoffset .2s ease; }\n  .gauge .marca { stroke: var(--gris); }\n  .gauge text { fill: var(--gris); font-family: var(--cond); font-size: 14px; font-weight: 600; }\n  .gauge #marcha { font-family: var(--cond); font-weight: 800; font-size: 80px; fill: var(--tiza); transition: fill .15s; }\n  .gauge #marchaTxt { font-family: var(--body); font-weight: 500; font-size: 15px; fill: var(--gris); }\n  .gauge .vel { font-family: var(--cond); font-weight: 700; font-size: 28px; fill: var(--tiza); }\n  .gauge .vel .pct { font-size: 18px; fill: var(--gris); }\n  #giroTxt { text-align: center; margin-top: 10px; font-family: var(--cond); font-weight: 600; font-size: 18px; color: var(--gris); }\n\n  .dist {\n    display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px auto 0;\n    width: fit-content; padding: 6px 14px; border-radius: 999px; background: var(--asfalto-2);\n    font-family: var(--cond); font-weight: 600; font-size: 18px; color: var(--gris);\n    transition: background .15s, color .15s;\n  }\n  .dist b { color: var(--tiza); font-weight: 700; }\n  .dist { border: 2px solid var(--azul); }\n  .dist.aviso { border-color: var(--amarillo); }\n  .dist.cerca { background: var(--freno); border-color: var(--freno); color: #fff; }\n  .dist.cerca b { color: #fff; }\n  .sema { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px auto 0; padding: 8px 14px;\n    width: fit-content; border-radius: 999px; background: #020a19; border: 2px solid var(--asfalto-3); }\n  .sema i { width: 18px; height: 18px; border-radius: 50%; opacity: .18; transition: opacity .1s, box-shadow .1s; }\n  .sema i.r { background: var(--freno); } .sema i.y { background: var(--amarillo); } .sema i.g { background: var(--verde); }\n  .sema i.on { opacity: 1; box-shadow: 0 0 14px currentColor; }\n  .sema i.r.on { color: var(--freno); } .sema i.y.on { color: var(--amarillo); } .sema i.g.on { color: var(--verde); }\n  .sema span { font-family: var(--cond); font-weight: 600; font-size: 15px; color: var(--gris); min-width: 120px; }\n  .camara {\n    width: min(100%, 340px); margin: 12px auto 0; padding: 8px 10px;\n    border: 1px solid var(--asfalto-3); border-radius: 10px; background: var(--asfalto-2);\n  }\n  .camara-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 13px; }\n  .camara-cabecera strong { font-family: var(--cond); font-size: 16px; }\n  #camaraEstado { color: var(--gris); font-size: 11px; text-align: right; }\n  .camara-controles { display: flex; gap: 6px; }\n  #camaraUrl { min-width: 0; flex: 1; padding: 6px 8px; border: 1px solid var(--asfalto-3); border-radius: 5px; background: var(--asfalto); color: var(--tiza); font-size: 11px; }\n  .camara-controles button { padding: 5px 8px; border: 0; border-radius: 5px; background: var(--linea); color: var(--asfalto); font-weight: 700; font-size: 11px; cursor: pointer; }\n  #camaraImagen { display: block; width: 100%; aspect-ratio: 4 / 3; margin-top: 7px; border-radius: 6px; background: #101416; object-fit: contain; }\n  #camaraImagen[hidden] { display: none; }\n  .auto-follow {\n    width: min(100%, 340px); margin: 10px auto 0; padding: 10px 12px;\n    border: 1px solid var(--asfalto-3); border-radius: 10px; background: var(--asfalto-2);\n  }\n  .auto-follow-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }\n  .auto-follow-head span { color: var(--gris); font-size: 13px; }\n  #autoToggle { border: 0; border-radius: 7px; padding: 9px 12px; color: var(--asfalto); background: var(--verde); font: 600 14px var(--body); cursor: pointer; }\n  #autoToggle[aria-pressed=\"true\"] { background: var(--freno); color: var(--tiza); }\n  #autoToggle:disabled { opacity: .5; cursor: not-allowed; }\n  .auto-follow small { display: block; margin-top: 8px; color: var(--gris); line-height: 1.4; }\n  .vision {\n    width: min(100%, 340px); margin: 10px auto 0; padding: 8px 12px;\n    border: 1px solid var(--asfalto-3); border-radius: 10px; background: var(--asfalto-2);\n    font-size: 13px;\n  }\n  .vision-cabecera, .vision-detalle { display: flex; align-items: center; gap: 8px; }\n  .vision-cabecera { min-height: 18px; }\n  .vision-cabecera strong { flex: 1; }\n  .vision-cabecera small { color: var(--gris); }\n  .vision-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: var(--gris); }\n  .vision.activa .vision-dot { background: var(--verde); }\n  .vision.detectada .vision-dot { background: var(--linea); }\n  .vision.detalle-off .vision-dot { background: var(--freno); }\n  .vision-detalle { justify-content: space-between; margin-top: 5px; color: var(--gris); }\n  .vision-detalle b { color: var(--tiza); font-weight: 600; }\n  #visionTexto { max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n  .vision-track { position: relative; height: 5px; margin-top: 8px; border-radius: 5px; background: var(--asfalto-3); }\n  .vision-marca { position: absolute; top: 50%; width: 11px; height: 11px; border: 2px solid var(--asfalto-2); border-radius: 50%; background: var(--linea); transform: translate(-50%, -50%); }\n  .vision-marca.oculta { display: none; }\n  .ayuda { font-size: 12px; color: var(--gris); text-align: center; line-height: 1.8; margin: 14px 0 0; }\n  kbd { font-family: var(--body); font-size: 11px; background: var(--asfalto-2); border-radius: 4px; padding: 1px 5px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.3); color: var(--tiza); }\n  @media (hover: none) { .ayuda { display: none; } }\n\n  /* Aviso para girar el celular */\n  .girar { display: none; }\n  @media (orientation: portrait) and (max-width: 700px) {\n    .cabina { display: none; }\n    header .vmax { display: none; }\n    .girar { display: grid; place-items: center; flex: 1; text-align: center; color: var(--gris); gap: 12px; }\n    .girar b { font-family: var(--cond); font-size: 26px; color: var(--tiza); display: block; }\n  }\n  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }\n</style>\n</head>\n<body>\n<header>\n  <h1>Robot <small>06</small></h1>\n  <div class=\"vmax\">\n    <label for=\"speed\">Velocidad máxima</label>\n    <input type=\"range\" id=\"speed\" min=\"40\" max=\"80\" step=\"5\" value=\"60\">\n    <output id=\"vMax\" for=\"speed\">60 %</output>\n  </div>\n  <span id=\"conn\">Conectado</span>\n</header>\n\n<div class=\"cabina\">\n  <!-- Joystick -->\n  <div class=\"joy-zona\">\n    <div id=\"joy\" role=\"application\" aria-label=\"Joystick: arriba adelante, abajo atrás, costados para doblar\">\n      <svg viewBox=\"0 0 200 200\" aria-hidden=\"true\">\n        <circle class=\"aro\" cx=\"100\" cy=\"100\" r=\"96\"/>\n        <circle class=\"zona\" cx=\"100\" cy=\"100\" r=\"15\"/>\n        <line class=\"cruz\" x1=\"100\" y1=\"28\" x2=\"100\" y2=\"172\"/>\n        <line class=\"cruz\" x1=\"28\" y1=\"100\" x2=\"172\" y2=\"100\"/>\n        <text x=\"100\" y=\"20\" text-anchor=\"middle\">adelante</text>\n        <text x=\"100\" y=\"190\" text-anchor=\"middle\">atrás</text>\n        <text x=\"12\" y=\"104\">izq</text>\n        <text x=\"188\" y=\"104\" text-anchor=\"end\">der</text>\n      </svg>\n      <div id=\"knob\"></div>\n    </div>\n  </div>\n\n  <!-- Velocímetro -->\n  <div>\n    <div class=\"tablero\">\n      <svg class=\"gauge\" viewBox=\"0 0 300 200\" aria-hidden=\"true\">\n        <defs><linearGradient id=\"grad\" x1=\"0\" x2=\"1\"><stop offset=\"0\" stop-color=\"#0093cc\"/><stop offset=\"1\" stop-color=\"#ff5fb8\"/></linearGradient></defs>\n        <path class=\"pista\" d=\"M 40 170 A 115 115 0 1 1 260 170\" fill=\"none\" stroke-width=\"14\" stroke-linecap=\"round\"/>\n        <path id=\"arco\" class=\"valor\" d=\"M 40 170 A 115 115 0 1 1 260 170\" fill=\"none\" stroke-width=\"14\" stroke-linecap=\"round\"/>\n        <g id=\"marcas\"></g>\n        <text id=\"marcha\" x=\"150\" y=\"128\" text-anchor=\"middle\">N</text>\n        <text id=\"marchaTxt\" x=\"150\" y=\"152\" text-anchor=\"middle\">Detenido</text>\n        <text class=\"vel\" x=\"150\" y=\"190\" text-anchor=\"middle\"><tspan id=\"vSpeed\">0</tspan><tspan class=\"pct\"> %</tspan></text>\n    </div>\n    <div id=\"giroTxt\">Recto</div>\n    <div class=\"dist\" id=\"dist\">Obstáculo <b id=\"distCm\">sin lectura</b></div>\n    <div class=\"sema\" aria-label=\"Semáforo del robot\"><i class=\"r\" id=\"semR\"></i><i class=\"y\" id=\"semY\"></i><i class=\"g\" id=\"semG\"></i><span id=\"semTxt\">Apagado</span></div>\n    <section class=\"camara\" aria-label=\"Video en vivo de la cámara del celular\">\n      <div class=\"camara-cabecera\"><strong>Cámara en vivo</strong><span id=\"camaraEstado\">Configurar URL del celular</span></div>\n      <form class=\"camara-controles\" id=\"camaraForm\">\n        <input id=\"camaraUrl\" type=\"url\" inputmode=\"url\" placeholder=\"http://IP_DEL_CELULAR:8080/video\" aria-label=\"URL del video del celular\" autocomplete=\"url\">\n        <button type=\"submit\">Conectar</button>\n        <button type=\"button\" id=\"camaraQuitar\">Quitar</button>\n      </form>\n      <img id=\"camaraImagen\" alt=\"Video en vivo del celular\" hidden>\n    </section>\n    <section class=\"vision detalle-off\" id=\"vision\" aria-live=\"polite\" aria-label=\"Estado de la cámara\">\n      <div class=\"vision-cabecera\"><span class=\"vision-dot\"></span><strong id=\"visionEstado\">Cámara sin señal</strong><small id=\"visionModo\">—</small></div>\n      <div class=\"vision-detalle\"><span>Objeto</span><b id=\"visionObjeto\">—</b><span>Posición</span><b id=\"visionPos\">—</b><b id=\"visionTexto\"></b></div>\n      <div class=\"vision-detalle\"><span>Área de imagen</span><b id=\"visionArea\">—</b></div>\n      <div class=\"vision-track\" aria-label=\"Posición horizontal\"><span class=\"vision-marca oculta\" id=\"visionMarca\"></span></div>\n    </section>\n    <section class=\"auto-follow\" aria-label=\"Seguimiento automático\">\n      <div class=\"auto-follow-head\"><strong>Seguimiento visual</strong><span id=\"autoEstado\">Manual</span></div>\n      <button id=\"autoToggle\" type=\"button\" aria-pressed=\"false\" disabled>Activar seguimiento</button>\n      <small>Avanza al detectar el objeto; se detiene si se pierde la señal o el SR04 bloquea el paso. STOP y los controles manuales cancelan el modo.</small>\n    </section>\n    <p class=\"ayuda\">\n      <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> o flechas para manejar, <kbd>Espacio</kbd> frena\n    </p>\n  </div>\n\n</div>\n\n<div class=\"girar\"><div><b>Girá el celular</b>El tablero se usa en horizontal</div></div>\n\n<script>\nconst URL_CMD = location.pathname.replace(/\\/$/, \"\") + \"/cmd\";\nconst URL_ESTADO = location.pathname.replace(/\\/$/, \"\") + \"/estado\";\nconst $ = id => document.getElementById(id);\nconst VEL_MIN = 45;     // por debajo de esto el motor no arranca\nconst ZONA_MUERTA = 0.15;\nconst MAX_ESCALA = 80;\n\n// ---------- Velocímetro ----------\nconst arco = $(\"arco\");\nconst LARGO = arco.getTotalLength();\narco.style.strokeDasharray = LARGO;\n(function () {\n  const g = $(\"marcas\"), cx = 150, cy = 136.5, r = 115;\n  for (let v = 0; v <= MAX_ESCALA; v += 20) {\n    const a = (163 + (v / MAX_ESCALA) * 214) * Math.PI / 180;\n    const p = k => [cx + Math.cos(a) * (r - k), cy + Math.sin(a) * (r - k)];\n    const [x1, y1] = p(14), [x2, y2] = p(24), [tx, ty] = p(40);\n    g.insertAdjacentHTML(\"beforeend\",\n      `<line class=\"marca\" x1=\"${x1}\" y1=\"${y1}\" x2=\"${x2}\" y2=\"${y2}\" stroke-width=\"2\"/>` +\n      (v === 40 ? \"\" : `<text x=\"${tx}\" y=\"${ty + 4}\" text-anchor=\"middle\">${v}</text>`));\n  }\n})();\n\n// ---------- Comunicación ----------\nlet last = 0, pending = null;\nfunction send(data) {\n  return fetch(URL_CMD, { method: \"POST\", headers: { \"Content-Type\": \"application/json\" }, body: JSON.stringify(data) })\n    .then(r => r.json()).then(st => { pintar(st); conectado(true); })\n    .catch(() => conectado(false));\n}\nfunction sendThrottled(data) {\n  const now = Date.now();\n  clearTimeout(pending);\n  if (now - last > 80) { last = now; send(data); }\n  else pending = setTimeout(() => { last = Date.now(); send(data); }, 80);\n}\nfunction sendYa(data) { clearTimeout(pending); last = Date.now(); send(data); }\nfunction conectado(ok) {\n  $(\"conn\").classList.toggle(\"off\", !ok);\n  $(\"conn\").textContent = ok ? \"Conectado\" : \"Sin conexión con Node-RED\";\n}\n\n// ---------- Pantalla ----------\nconst MARCHAS = {\n  adelante: { l: \"D\", t: \"Adelante\", c: \"var(--verde)\" },\n  atras:    { l: \"R\", t: \"Atrás\",    c: \"var(--reversa)\" },\n  stop:     { l: \"N\", t: \"Detenido\", c: \"var(--tiza)\" }\n};\nfunction pintarDist(st) {\n  const d = st.distancia, cerca = st.cerca, f = st.frenoCm;\n  const el = $(\"dist\");\n  el.classList.toggle(\"cerca\", !!cerca || !!st.sensorCaido);\n  el.classList.toggle(\"aviso\", !cerca && typeof d === \"number\" && f && d < f + 20);\n  if (st.sensorCaido) { el.innerHTML = 'Sensor <b>sin datos, no avanza</b>'; return; }\n  if (d === null || d === undefined) { el.innerHTML = 'Camino <b>libre</b>' + (f ? ` · freno a ${f} cm` : \"\"); return; }\n  el.innerHTML = (cerca ? \"Frenado: obstáculo a \" : \"Obstáculo a \") + `<b>${Math.round(d)} cm</b>` + (f ? ` · freno a ${f} cm` : \"\");\n}\nconst SEM = { rojo: [\"r\", \"Rojo: frenado\"], \"rojo-parpadeo\": [\"r\", \"Rojo: obstáculo cerca\"],\n              amarillo: [\"y\", \"Amarillo: atrás\"], verde: [\"g\", \"Verde: adelante\"], apagado: [\"\", \"Apagado\"] };\nfunction pintarSem(st) {\n  const s = SEM[st.luz] || SEM.apagado;\n  [\"r\", \"y\", \"g\"].forEach(c => $(\"sem\" + c.toUpperCase()).classList.toggle(\"on\", c === s[0]));\n  $(\"semTxt\").textContent = s[1];\n}\nfunction pintarVision(v) {\n  v = v || {};\n  const panel = $(\"vision\");\n  const activo = v.activo === true;\n  const detectado = activo && v.detectado === true;\n  panel.classList.toggle(\"activa\", activo && !detectado);\n  panel.classList.toggle(\"detectada\", detectado);\n  panel.classList.toggle(\"detalle-off\", !activo);\n  $(\"visionEstado\").textContent = !activo ? \"Cámara sin señal\" : (detectado ? \"Objeto detectado\" : \"Sin objeto\");\n  $(\"visionModo\").textContent = activo && v.modo ? \"Modo \" + v.modo : \"—\";\n  $(\"visionObjeto\").textContent = !activo ? \"—\" : (detectado ? \"Sí\" : \"No\");\n  const x = Number.isFinite(v.x) ? Math.max(0, Math.min(1, v.x)) : null;\n  $(\"visionPos\").textContent = !detectado ? \"—\" : x === null ? \"detectado\" :\n    (x < 0.4 ? \"izquierda\" : x > 0.6 ? \"derecha\" : \"centro\");\n  $(\"visionTexto\").textContent = activo && typeof v.texto === \"string\" ? v.texto : \"\";\n  $(\"visionArea\").textContent = detectado && Number.isFinite(v.area) ? (v.area * 100).toFixed(2) + \"%\" : \"—\";\n  const marca = $(\"visionMarca\");\n  marca.classList.toggle(\"oculta\", !detectado || x === null);\n  if (x !== null) marca.style.left = (x * 100) + \"%\";\n}\nconst CAMARA_STORAGE_KEY = \"raspirobot-camara-url\";\nconst camaraImagen = $(\"camaraImagen\");\nconst camaraEstado = $(\"camaraEstado\");\nfunction conectarCamara(rawUrl) {\n  let url;\n  try { url = new URL(rawUrl); }\n  catch { camaraEstado.textContent = \"Ingresá una URL válida\"; return; }\n  if (!([\"http:\", \"https:\"].includes(url.protocol)) || !url.hostname) {\n    camaraEstado.textContent = \"Usá una URL HTTP o HTTPS\";\n    return;\n  }\n  $(\"camaraUrl\").value = url.href;\n  localStorage.setItem(CAMARA_STORAGE_KEY, url.href);\n  camaraImagen.hidden = false;\n  camaraEstado.textContent = \"Conectando…\";\n  camaraImagen.src = url.href;\n}\n$(\"camaraForm\").addEventListener(\"submit\", e => {\n  e.preventDefault();\n  conectarCamara($(\"camaraUrl\").value.trim());\n});\n$(\"camaraQuitar\").addEventListener(\"click\", () => {\n  localStorage.removeItem(CAMARA_STORAGE_KEY);\n  camaraImagen.removeAttribute(\"src\");\n  camaraImagen.hidden = true;\n  camaraEstado.textContent = \"Configurar URL del celular\";\n});\ncamaraImagen.addEventListener(\"load\", () => { camaraEstado.textContent = \"En vivo\"; });\ncamaraImagen.addEventListener(\"error\", () => { camaraEstado.textContent = \"No se pudo abrir el video\"; });\nconst camaraGuardada = localStorage.getItem(CAMARA_STORAGE_KEY);\nif (camaraGuardada) conectarCamara(camaraGuardada);\n\nfunction pintar(st) {\n  pintarDist(st);\n  pintarSem(st);\n  if (st.vision) pintarVision(st.vision);\n  const seguimiento = st.auto === true;\n  const visionLista = st.vision && st.vision.seguimiento_disponible === true;\n  $(\"autoToggle\").setAttribute(\"aria-pressed\", String(seguimiento));\n  $(\"autoToggle\").textContent = seguimiento ? \"Desactivar seguimiento\" : \"Activar seguimiento\";\n  $(\"autoToggle\").disabled = !seguimiento && !visionLista;\n  $(\"autoEstado\").textContent = seguimiento ? (st.cmd === \"adelante\" ? \"Siguiendo objeto\" : \"Activo; esperando\") : \"Manual\";\n  const m = MARCHAS[st.cmd];\n  $(\"marcha\").textContent = m.l; $(\"marcha\").style.fill = m.c; $(\"marchaTxt\").textContent = m.t;\n  const v = st.cmd === \"stop\" ? 0 : st.speed;\n  $(\"vSpeed\").textContent = v;\n  arco.style.strokeDashoffset = LARGO * (1 - v / MAX_ESCALA);\n  const s = st.steer;\n  $(\"giroTxt\").textContent = s === 0 ? \"Recto\" : (s < 0 ? `Izquierda ${-s} %` : `Derecha ${s} %`);\n  $(\"joy\").classList.toggle(\"d\", st.cmd === \"adelante\");\n  $(\"joy\").classList.toggle(\"r\", st.cmd === \"atras\");\n}\n\n// ---------- Joystick: (x, y) en -1..1 → comando ----------\nfunction aplicar(x, y) {\n  const steer = Math.round(x * 100);\n  const vmax = Number($(\"speed\").value);\n  // La velocidad sale de cuánto se empuja el joystick (también en diagonal),\n  // así al doblar no pierde velocidad. Adelante/atrás lo decide el eje Y.\n  if (Math.abs(y) < ZONA_MUERTA) return { cmd: \"stop\", steer };\n  const mag = Math.min(1, Math.hypot(x, y));\n  const t = (mag - ZONA_MUERTA) / (1 - ZONA_MUERTA);\n  const speed = Math.round(VEL_MIN + t * (vmax - VEL_MIN));\n  return { cmd: y < 0 ? \"adelante\" : \"atras\", speed, steer };\n}\nfunction moverKnob(x, y) {\n  $(\"knob\").style.transform = `translate(${x * 100}%, ${y * 100}%)`;\n}\n\nconst joy = $(\"joy\");\nlet activo = false;\nfunction leer(e) {\n  const r = joy.getBoundingClientRect();\n  let x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2 * 0.6);\n  let y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2 * 0.6);\n  const d = Math.hypot(x, y);\n  if (d > 1) { x /= d; y /= d; }\n  return [x, y];\n}\njoy.addEventListener(\"pointerdown\", e => {\n  joy.setPointerCapture(e.pointerId); activo = true; joy.classList.add(\"activo\");\n  const [x, y] = leer(e); moverKnob(x, y); sendThrottled(aplicar(x, y));\n});\njoy.addEventListener(\"pointermove\", e => {\n  if (!activo) return;\n  const [x, y] = leer(e); moverKnob(x, y); sendThrottled(aplicar(x, y));\n});\nfunction soltarJoy() {\n  if (!activo) return;\n  activo = false; joy.classList.remove(\"activo\");\n  moverKnob(0, 0); sendYa({ cmd: \"stop\", steer: 0 });\n}\njoy.addEventListener(\"pointerup\", soltarJoy);\njoy.addEventListener(\"pointercancel\", soltarJoy);\n\nfunction frenar() { moverKnob(0, 0); sendYa({ cmd: \"stop\", steer: 0 }); }\n\n$(\"autoToggle\").addEventListener(\"click\", () => {\n  const activar = $(\"autoToggle\").getAttribute(\"aria-pressed\") !== \"true\";\n  send(activar ? { auto: true } : { auto: false, cmd: \"stop\", steer: 0 });\n});\n\n$(\"speed\").addEventListener(\"input\", e => { $(\"vMax\").textContent = e.target.value + \" %\"; });\n\n// ---------- Teclado: mismo joystick ----------\nconst k = { up: false, down: false, left: false, right: false };\nconst MAPA = { w: \"up\", arrowup: \"up\", s: \"down\", arrowdown: \"down\", a: \"left\", arrowleft: \"left\", d: \"right\", arrowright: \"right\" };\nfunction desdeTeclas() {\n  const x = (k.right ? 1 : 0) - (k.left ? 1 : 0);\n  const y = (k.down ? 1 : 0) - (k.up ? 1 : 0);\n  moverKnob(x * (y ? .707 : 1), y * (x ? .707 : 1));\n  sendYa(aplicar(x, y));\n}\ndocument.addEventListener(\"keydown\", e => {\n  if (e.target.tagName === \"INPUT\") return;\n  const key = e.key.toLowerCase();\n  if (key === \" \") { e.preventDefault(); frenar(); return; }\n  const dir = MAPA[key];\n  if (!dir || e.repeat) return;\n  e.preventDefault(); k[dir] = true; desdeTeclas();\n});\ndocument.addEventListener(\"keyup\", e => {\n  const dir = MAPA[e.key.toLowerCase()];\n  if (!dir) return;\n  k[dir] = false; desdeTeclas();\n});\nwindow.addEventListener(\"blur\", () => { Object.keys(k).forEach(n => k[n] = false); frenar(); });\n\nsend({ cmd: \"stop\", steer: 0 });\n\n// Leer distancia y estado cada 300 ms (sin mandar órdenes)\nsetInterval(() => {\n  fetch(URL_ESTADO).then(r => r.json()).then(st => { pintar(st); conectado(true); }).catch(() => conectado(false));\n}, 200);\n</script>\n</body>\n</html>\n",
     "output": "str",
     "x": 320,
     "y": 100,
@@ -441,7 +856,7 @@
   {
     "id": "d_hdr",
     "type": "change",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "tipo HTML",
     "rules": [
       {
@@ -468,7 +883,7 @@
   {
     "id": "d_res1",
     "type": "http response",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "",
     "statusCode": "",
     "headers": {},
@@ -479,7 +894,7 @@
   {
     "id": "d_post",
     "type": "http in",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "POST /robot/cmd",
     "url": "/robot/cmd",
     "method": "post",
@@ -496,7 +911,7 @@
   {
     "id": "d_init",
     "type": "inject",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Stop y centrar al iniciar",
     "props": [
       {
@@ -508,7 +923,7 @@
     "once": true,
     "onceDelay": "3",
     "topic": "",
-    "payload": "{\"cmd\":\"stop\",\"steer\":0}",
+    "payload": "{\"cmd\":\"stop\",\"steer\":0,\"auto\":false}",
     "payloadType": "json",
     "x": 160,
     "y": 280,
@@ -521,9 +936,9 @@
   {
     "id": "d_ctl",
     "type": "function",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Control robot",
-    "func": "// ===== Configuración =====\nconst MAX_SPEED   = 80;   // tope de velocidad (%), batería 9 V / motor 6 V\nconst SERVO_LEFT   = 500;   // µs izquierda total (calibrado)\nconst SERVO_CENTER = 1200;  // µs recto (calibrado)\nconst SERVO_RIGHT  = 2500;  // µs derecha total (calibrado)\nconst BRAKE_MS    = 200;  // pausa al cambiar de sentido\nconst LIMITE_CM   = 20;   // si hay algo más cerca que esto, no deja ir adelante\n\n// Estado actual (se guarda entre mensajes)\nlet st = flow.get(\"robot\") || { cmd: \"stop\", speed: 60, steer: 0 };\nconst prevCmd = st.cmd;\n\n// Leer lo que mandó el tablero (o el inject de inicio)\nconst p = (typeof msg.payload === \"object\" && msg.payload) ? msg.payload : {};\nif ([\"adelante\", \"atras\", \"stop\"].includes(p.cmd)) st.cmd = p.cmd;\nif (p.speed !== undefined && !isNaN(p.speed)) st.speed = Math.max(0, Math.min(MAX_SPEED, Number(p.speed)));\nif (p.steer !== undefined && !isNaN(p.steer)) st.steer = Math.max(-100, Math.min(100, Number(p.steer)));\n// Freno por obstáculo: no permite avanzar si hay algo muy cerca (atrás sí)\nconst dist = flow.get(\"distancia\");\nst.bloqueado = st.cmd === \"adelante\" && typeof dist === \"number\" && dist < LIMITE_CM;\nif (st.bloqueado) st.cmd = \"stop\";\nflow.set(\"robot\", st);\n\n// ---- Motor: [Izq PWM, Izq 1, Izq 2, Der PWM, Der 1, Der 2] ----\nfunction pines(pwm, dir) {\n    return [{payload:pwm},{payload:dir},{payload:dir?0:1},\n            {payload:pwm},{payload:dir},{payload:dir?0:1}];\n}\nconst STOP = [{payload:0},{payload:0},{payload:0},{payload:0},{payload:0},{payload:0}];\n\n// ---- Servo: steer -100..100 -> valor 0..100 del nodo servo ----\nlet s = st.steer;\nlet servo = s < 0 ? SERVO_CENTER + (s / 100) * (SERVO_CENTER - SERVO_LEFT)\n                  : SERVO_CENTER + (s / 100) * (SERVO_RIGHT - SERVO_CENTER);\nservo = Math.round((servo - 500) / 20);   // µs → 0..100 para el nodo (500..2500)\n\n// Cancelar un arranque pendiente\nclearTimeout(context.get(\"t\"));\ncontext.set(\"t\", null);\n\nlet motorMsgs;\nif (st.cmd === \"stop\") {\n    motorMsgs = STOP;\n} else {\n    const dir = st.cmd === \"atras\" ? 1 : 0;\n    const cambioSentido = (prevCmd === \"adelante\" && st.cmd === \"atras\") ||\n                          (prevCmd === \"atras\" && st.cmd === \"adelante\");\n    if (cambioSentido) {\n        // frenar, esperar y recién ahí arrancar en el otro sentido\n        motorMsgs = pines(0, dir);\n        context.set(\"t\", setTimeout(() => {\n            node.send([...pines(st.speed, dir), null, null]);\n        }, BRAKE_MS));\n    } else {\n        motorMsgs = pines(st.speed, dir);\n    }\n}\n\nnode.status({\n    fill: st.cmd === \"stop\" ? \"red\" : \"green\", shape: \"dot\",\n    text: st.cmd + \" \" + st.speed + \"% | giro \" + st.steer + \" (servo \" + servo + \")\"\n});\n\n// Respuesta al navegador (solo si vino del tablero)\nlet resp = null;\nif (msg.res) {\n    msg.payload = { ...st, distancia: flow.get(\"distancia\") ?? null, cerca: !!flow.get(\"cerca\") };\n    resp = msg;\n}\nreturn [...motorMsgs, { payload: servo }, resp];",
+    "func": "// ===== Configuración =====\nconst MAX_SPEED   = 80;   // tope de velocidad (%), batería 9 V / motor 6 V\nconst SERVO_LEFT   = 500;   // µs izquierda total (calibrado)\nconst SERVO_CENTER = 1200;  // µs recto (calibrado)\nconst SERVO_RIGHT  = 2500;  // µs derecha total (calibrado)\nconst BRAKE_MS    = 200;  // pausa al cambiar de sentido\nconst GIRO_IZQ    = 40;   // % máximo de giro a la IZQUIERDA (100 = tope del servo)\nconst GIRO_DER    = 40;   // % máximo de giro a la DERECHA\nconst EXTRA_GIRO  = 15;   // % de velocidad extra al doblar (las ruedas giradas frenan el robot)\nconst LIMITE_CM   = 25;   // distancia de freno si todavía no hay lectura (la real la calcula \"Distancia y freno\")\n\n// Estado actual (se guarda entre mensajes)\nlet st = flow.get(\"robot\") || { cmd: \"stop\", speed: 60, steer: 0, auto: false };\nif (typeof st.auto !== \"boolean\") st.auto = false;\nconst prevCmd = st.cmd;\n\n// Leer lo que mandó el tablero (o el inject de inicio)\nconst p = (typeof msg.payload === \"object\" && msg.payload) ? msg.payload : {};\nif (typeof p.auto === \"boolean\") {\n    const estabaEnAuto = st.auto;\n    st.auto = p.auto;\n    if (p.auto || estabaEnAuto) { st.cmd = \"stop\"; st.steer = 0; }\n}\nif ([\"adelante\", \"atras\", \"stop\"].includes(p.cmd)) {\n    if (p.origen !== \"vision\") st.auto = false;\n    st.cmd = p.cmd;\n}\nif (p.speed !== undefined && !isNaN(p.speed)) st.speed = Math.max(0, Math.min(MAX_SPEED, Number(p.speed)));\nif (p.steer !== undefined && !isNaN(p.steer)) st.steer = Math.max(-100, Math.min(100, Number(p.steer)));\n// Freno por obstáculo: no permite avanzar si hay algo muy cerca (atrás sí)\nconst dist = flow.get(\"distancia\");\nconst frenoCm = flow.get(\"frenoCm\") || LIMITE_CM;\nconst sensorCaido = Date.now() - (flow.get(\"tLectura\") || 0) > 1500;   // sin datos: no deja avanzar\nst.sensorCaido = sensorCaido;\nst.bloqueado = st.cmd === \"adelante\" && (sensorCaido || (typeof dist === \"number\" && dist < frenoCm));\nif (st.bloqueado) {\n    st.cmd = \"stop\";\n    st.steer = 0;\n    st.auto = false;\n}\nflow.set(\"robot\", st);\n\n// ---- Motor: [Izq PWM, Izq 1, Izq 2, Der PWM, Der 1, Der 2] ----\nfunction pines(pwm, dir) {\n    return [{payload:pwm},{payload:dir},{payload:dir?0:1},\n            {payload:pwm},{payload:dir},{payload:dir?0:1}];\n}\nconst STOP = [{payload:0},{payload:0},{payload:0},{payload:0},{payload:0},{payload:0}];\n\n// ---- Servo: steer -100..100 -> valor 0..100 del nodo servo ----\n// Se limita el giro para que las ruedas no choquen con la estructura\nlet s = st.steer < 0 ? st.steer * GIRO_IZQ / 100 : st.steer * GIRO_DER / 100;\nlet servo = s < 0 ? SERVO_CENTER + (s / 100) * (SERVO_CENTER - SERVO_LEFT)\n                  : SERVO_CENTER + (s / 100) * (SERVO_RIGHT - SERVO_CENTER);\nservo = Math.round((servo - 500) / 20);   // µs → 0..100 para el nodo (500..2500)\n\n// Cancelar un arranque pendiente\nclearTimeout(context.get(\"t\"));\ncontext.set(\"t\", null);\n\nlet motorMsgs;\nif (st.cmd === \"stop\") {\n    motorMsgs = STOP;\n} else {\n    const dir = st.cmd === \"atras\" ? 1 : 0;\n    const vel = Math.min(MAX_SPEED, st.speed + EXTRA_GIRO * Math.abs(st.steer) / 100);\n    const cambioSentido = (prevCmd === \"adelante\" && st.cmd === \"atras\") ||\n                          (prevCmd === \"atras\" && st.cmd === \"adelante\");\n    if (cambioSentido) {\n        // frenar, esperar y recién ahí arrancar en el otro sentido\n        motorMsgs = pines(0, dir);\n        context.set(\"t\", setTimeout(() => {\n            node.send([...pines(vel, dir), null, null]);\n        }, BRAKE_MS));\n    } else {\n        motorMsgs = pines(vel, dir);\n    }\n}\n\nnode.status({\n    fill: st.cmd === \"stop\" ? \"red\" : \"green\", shape: \"dot\",\n    text: st.cmd + \" \" + st.speed + \"% | giro \" + st.steer + \" (servo \" + servo + \")\"\n});\n\n// Respuesta al navegador (solo si vino del tablero)\nlet resp = null;\nif (msg.res) {\n    msg.payload = { ...st, distancia: flow.get(\"distancia\") ?? null, cerca: !!flow.get(\"cerca\"), luz: flow.get(\"luz\") || \"apagado\", frenoCm: flow.get(\"frenoCm\") || null };\n    resp = msg;\n}\nreturn [...motorMsgs, { payload: servo }, resp];",
     "outputs": 8,
     "timeout": 0,
     "noerr": 0,
@@ -572,7 +987,7 @@
   {
     "id": "d_p1",
     "type": "pi-gpiod out",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Izq PWM (BCM24)",
     "host": "localhost",
     "port": 8888,
@@ -590,7 +1005,7 @@
   {
     "id": "d_p2",
     "type": "pi-gpiod out",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Izq 1 (BCM17)",
     "host": "localhost",
     "port": 8888,
@@ -608,7 +1023,7 @@
   {
     "id": "d_p3",
     "type": "pi-gpiod out",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Izq 2 (BCM4)",
     "host": "localhost",
     "port": 8888,
@@ -626,7 +1041,7 @@
   {
     "id": "d_p4",
     "type": "pi-gpiod out",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Der PWM (BCM14)",
     "host": "localhost",
     "port": 8888,
@@ -644,7 +1059,7 @@
   {
     "id": "d_p5",
     "type": "pi-gpiod out",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Der 1 (BCM10)",
     "host": "localhost",
     "port": 8888,
@@ -662,7 +1077,7 @@
   {
     "id": "d_p6",
     "type": "pi-gpiod out",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Der 2 (BCM25)",
     "host": "localhost",
     "port": 8888,
@@ -680,7 +1095,7 @@
   {
     "id": "d_srv",
     "type": "pi-gpiod out",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Servo dirección (GPIO 2)",
     "host": "localhost",
     "port": 8888,
@@ -698,7 +1113,7 @@
   {
     "id": "d_res2",
     "type": "http response",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "",
     "statusCode": "",
     "headers": {},
@@ -709,9 +1124,9 @@
   {
     "id": "d_c2",
     "type": "comment",
-    "z": "robotdash",
-    "name": "Sensor de distancia: conectar acá la salida del nodo SR04 →",
-    "info": "Arrastren su nodo SR04 (Trigger GPIO 18, Echo GPIO 23) y conecten su salida a la entrada de 'Distancia y freno'.\nTiene que mandar la distancia en cm en msg.payload.",
+    "z": "57cb155c8e043b9f",
+    "name": "Velocidad, distancia de freno y aviso: ver nodo 'Distancia y freno'",
+    "info": "La distancia de freno crece con la velocidad: FRENO = BASE + velocidad × K.\nEl aviso (rojo parpadeando + pitidos) empieza AVISO_EXTRA cm antes.",
     "x": 240,
     "y": 400,
     "wires": []
@@ -719,17 +1134,17 @@
   {
     "id": "d_dist",
     "type": "function",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Distancia y freno",
-    "func": "// Recibe la distancia del nodo SR04 (msg.payload en cm)\nconst LIMITE_CM = 20;   // mismo valor que en \"Control robot\"\nconst d = Number(msg.payload);\nif (isNaN(d) || d <= 2 || d > 400) return null;   // lecturas fuera de rango del sensor\n\nflow.set(\"distancia\", d);\nconst st = flow.get(\"robot\") || {};\nconst cerca = d < LIMITE_CM;\nflow.set(\"cerca\", cerca);\nnode.status({ fill: cerca ? \"red\" : \"green\", shape: \"dot\", text: d.toFixed(1) + \" cm\" });\n\n// Si va para adelante y aparece algo cerca, frenar\nif (cerca && st.cmd === \"adelante\") return { payload: { cmd: \"stop\" } };\nreturn null;",
+    "func": "// ===== Distancia, freno y aviso =====\n// Recibe lo que imprime el sensor: distancia en cm, o -1 si no hay nada en rango\nconst FRENO_BASE  = 15;    // cm de freno a velocidad 0\nconst FRENO_K     = 0.25;  // cm extra por cada % de velocidad (a 80 % frena a 35 cm)\nconst AVISO_EXTRA = 20;    // el aviso empieza estos cm antes del freno\n\nconst partes = String(msg.payload).trim().split(/\\s+/);\nconst d = Number(partes[partes.length - 1]);\nconst st = flow.get(\"robot\") || { cmd: \"stop\", speed: 60 };\n\n// Distancia de freno según la velocidad que lleva\nconst frenoCm = Math.round(FRENO_BASE + (Number(st.speed) || 0) * FRENO_K);\nflow.set(\"frenoCm\", frenoCm);\nflow.set(\"avisoCm\", frenoCm + AVISO_EXTRA);\nflow.set(\"tLectura\", Date.now());\n\nif (isNaN(d) || d < 0) {\n    // Sin eco = no hay nada delante en rango: camino libre\n    flow.set(\"distancia\", null);\n    flow.set(\"cerca\", false);\n    node.status({ fill: \"green\", shape: \"ring\", text: \"libre (freno a \" + frenoCm + \" cm)\" });\n    return null;\n}\n\nflow.set(\"distancia\", d);\nconst cerca = d < frenoCm;\nflow.set(\"cerca\", cerca);\nnode.status({ fill: cerca ? \"red\" : (d < frenoCm + AVISO_EXTRA ? \"yellow\" : \"green\"), shape: \"dot\",\n              text: d.toFixed(0) + \" cm | freno a \" + frenoCm + \" cm\" });\n\n// Si va para adelante y está dentro de la distancia de freno: STOP inmediato\nif (cerca && st.cmd === \"adelante\") return { payload: { cmd: \"stop\" } };\nreturn null;",
     "outputs": 1,
     "timeout": 0,
     "noerr": 0,
     "initialize": "",
     "finalize": "",
     "libs": [],
-    "x": 410,
-    "y": 580,
+    "x": 420,
+    "y": 640,
     "wires": [
       [
         "d_ctl"
@@ -739,7 +1154,7 @@
   {
     "id": "d_get2",
     "type": "http in",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "GET /robot/estado",
     "url": "/robot/estado",
     "method": "get",
@@ -756,9 +1171,9 @@
   {
     "id": "d_est",
     "type": "function",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "Estado actual",
-    "func": "const st = flow.get(\"robot\") || { cmd: \"stop\", speed: 60, steer: 0 };\nconst vision = global.get(\"robot_vision\");\nconst edad = vision ? Date.now() - vision.recibido : null;\nconst visionActiva = edad !== null && edad < 3000;\nmsg.payload = {\n    ...st,\n    distancia: flow.get(\"distancia\") ?? null,\n    cerca: !!flow.get(\"cerca\"),\n    vision: visionActiva\n        ? { ...vision, edad_ms: edad }\n        : { activo: false, detectado: null, modo: null, x: null, area: null, texto: null, edad_ms: edad }\n};\nreturn msg;",
+    "func": "const st = flow.get(\"robot\") || { cmd: \"stop\", speed: 60, steer: 0, auto: false };\nif (typeof st.auto !== \"boolean\") st.auto = false;\nst.sensorCaido = Date.now() - (flow.get(\"tLectura\") || 0) > 1500;\n// Estado de la cámara (lo guarda la pestaña \"Vision RaspiRobot\")\nconst vision = global.get(\"robot_vision\");\nconst edad = vision ? Date.now() - vision.recibido : null;\nconst visionActiva = edad !== null && edad < 3000;\nconst seguimientoDisponible = visionActiva && edad < 750 && vision.detectado === true && vision.mensajes_recientes >= 3 && Number.isFinite(vision.x);\nmsg.payload = { ...st, distancia: flow.get(\"distancia\") ?? null, cerca: !!flow.get(\"cerca\"),\n                luz: flow.get(\"luz\") || \"apagado\", frenoCm: flow.get(\"frenoCm\") || null,\n                vision: visionActiva\n                    ? { ...vision, edad_ms: edad, seguimiento_disponible: seguimientoDisponible }\n                    : { activo: false, detectado: null, modo: null, x: null, area: null, texto: null, edad_ms: edad } };\nreturn msg;",
     "outputs": 1,
     "timeout": 0,
     "noerr": 0,
@@ -776,7 +1191,7 @@
   {
     "id": "d_res3",
     "type": "http response",
-    "z": "robotdash",
+    "z": "57cb155c8e043b9f",
     "name": "",
     "statusCode": "",
     "headers": {},
@@ -785,136 +1200,380 @@
     "wires": []
   },
   {
-    "id": "364c0e7a1aa563a0",
-    "type": "rpi-srf",
-    "z": "robotdash",
-    "name": "Sensor DISTANCIA",
-    "topic": "distancia",
-    "pulse": "0.5",
-    "pins": "12,16",
-    "precision": "1",
-    "x": 150,
+    "id": "s_c",
+    "type": "comment",
+    "z": "57cb155c8e043b9f",
+    "name": "Semáforo: R → GPIO 11, Y → GPIO 22, G → GPIO 9 | Buzzer: + → GPIO 15 | GND → G",
+    "info": "Adelante: VERDE.\nAdelante y objeto a menos de 40 cm: ROJO PARPADEANDO.\nObjeto a menos de 20 cm: frena y ROJO FIJO.\nAtrás: AMARILLO.\nDetenido sin obstáculo: todo apagado.\nSiempre hay un solo LED prendido y al máximo brillo (salida digital 1).\nEl buzzer (GPIO 15) suena cada vez que está prendido el rojo: continuo al frenar, intermitente en el aviso.\nAl iniciar se ejecuta 'pigs pads 0 16': sube la corriente máxima de los GPIO de 8 a 16 mA para que los LEDs (sobre todo el verde) brillen más.",
+    "x": 290,
+    "y": 760,
+    "wires": []
+  },
+  {
+    "id": "s_tick",
+    "type": "inject",
+    "z": "57cb155c8e043b9f",
+    "name": "cada 100 ms",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "0.1",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "1",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 140,
+    "y": 820,
+    "wires": [
+      [
+        "s_fn"
+      ]
+    ]
+  },
+  {
+    "id": "s_fn",
+    "type": "function",
+    "z": "57cb155c8e043b9f",
+    "name": "Semáforo y buzzer",
+    "func": "// ===== Semáforo del robot =====\n// Rojo GPIO 11, Amarillo GPIO 22, Verde GPIO 9 (siempre al máximo: 1 = 3,3 V)\n// Distancias calculadas en \"Distancia y freno\" según la velocidad\nconst FRENO_CM = flow.get(\"frenoCm\") || 25;   // más cerca: frena y ROJO FIJO\nconst AVISO_CM = flow.get(\"avisoCm\") || 45;   // entre freno y aviso yendo adelante: ROJO PARPADEANDO\nconst PARPADEO_MS = 250;\n// Buzzer en GPIO 15 (amarillo +, naranja − a GND)\n// \"activo\": suena solo con corriente  |  \"pasivo\": necesita PWM (tono)\nconst BUZZER = \"pasivo\";   // el de ustedes es pasivo (sonó con pigs p 15 128)\n\nconst st = flow.get(\"robot\") || { cmd: \"stop\" };\nconst d = flow.get(\"distancia\");\nconst hayLectura = typeof d === \"number\";\n\nlet luz;\nif (st.cmd === \"atras\") {\n    luz = \"amarillo\";                                   // marcha atrás\n} else if (st.bloqueado || (hayLectura && d < FRENO_CM)) {\n    luz = \"rojo\";                                       // obstáculo cerca: frenado\n} else if (st.cmd === \"adelante\" && hayLectura && d < AVISO_CM) {\n    luz = \"rojo-parpadeo\";                              // se está acercando a algo\n} else if (st.cmd === \"adelante\") {\n    luz = \"verde\";                                      // camino libre\n} else {\n    luz = \"apagado\";                                    // detenido sin obstáculo\n}\nflow.set(\"luz\", luz);\n\n// Qué LED va prendido (los demás se apagan)\nconst encendidoParpadeo = Math.floor(Date.now() / PARPADEO_MS) % 2 === 0;\nconst R = (luz === \"rojo\" || (luz === \"rojo-parpadeo\" && encendidoParpadeo)) ? 1 : 0;\nconst Y = luz === \"amarillo\" ? 1 : 0;\nconst G = luz === \"verde\" ? 1 : 0;\n\n// Mandar a los pines solo si cambió algo\nconst clave = R + \"\" + Y + G;\nif (context.get(\"ultimo\") === clave) return null;\ncontext.set(\"ultimo\", clave);\n\nconst color = { rojo: \"red\", \"rojo-parpadeo\": \"red\", amarillo: \"yellow\", verde: \"green\", apagado: \"grey\" }[luz];\nnode.status({ fill: color, shape: luz === \"rojo-parpadeo\" ? \"ring\" : \"dot\",\n              text: luz + (hayLectura ? \" | \" + d.toFixed(0) + \" cm\" : \"\") });\n\n// El buzzer suena igual que el LED rojo: fijo o intermitente\nconst B = R ? (BUZZER === \"pasivo\" ? 50 : 100) : 0;   // 50 % = onda cuadrada pareja = volumen máximo\n\nreturn [{ payload: R }, { payload: Y }, { payload: G }, { payload: B }];",
+    "outputs": 4,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 340,
+    "y": 820,
+    "outputLabels": [
+      "Rojo",
+      "Amarillo",
+      "Verde",
+      "Buzzer"
+    ],
+    "wires": [
+      [
+        "s_r"
+      ],
+      [
+        "s_y"
+      ],
+      [
+        "s_g"
+      ],
+      [
+        "s_b"
+      ]
+    ]
+  },
+  {
+    "id": "s_r",
+    "type": "pi-gpiod out",
+    "z": "57cb155c8e043b9f",
+    "name": "LED ROJO (GPIO 11)",
+    "host": "localhost",
+    "port": 8888,
+    "pin": "11",
+    "set": true,
+    "level": "0",
+    "out": "out",
+    "sermin": "1000",
+    "sermax": "2000",
+    "freq": "800",
+    "x": 640,
+    "y": 780,
+    "wires": []
+  },
+  {
+    "id": "s_y",
+    "type": "pi-gpiod out",
+    "z": "57cb155c8e043b9f",
+    "name": "LED AMARILLO (GPIO 22)",
+    "host": "localhost",
+    "port": 8888,
+    "pin": "22",
+    "set": true,
+    "level": "0",
+    "out": "out",
+    "sermin": "1000",
+    "sermax": "2000",
+    "freq": "800",
+    "x": 640,
+    "y": 820,
+    "wires": []
+  },
+  {
+    "id": "s_g",
+    "type": "pi-gpiod out",
+    "z": "57cb155c8e043b9f",
+    "name": "LED VERDE (GPIO 9)",
+    "host": "localhost",
+    "port": 8888,
+    "pin": "9",
+    "set": true,
+    "level": "0",
+    "out": "out",
+    "sermin": "1000",
+    "sermax": "2000",
+    "freq": "800",
+    "x": 640,
+    "y": 860,
+    "wires": []
+  },
+  {
+    "id": "s_b",
+    "type": "pi-gpiod out",
+    "z": "57cb155c8e043b9f",
+    "name": "Buzzer pasivo (GPIO 15, 2000 Hz)",
+    "host": "localhost",
+    "port": 8888,
+    "pin": "15",
+    "set": true,
+    "level": "0",
+    "out": "pwm",
+    "sermin": "1000",
+    "sermax": "2000",
+    "freq": "2000",
+    "x": 640,
+    "y": 900,
+    "wires": []
+  },
+  {
+    "id": "x_c",
+    "type": "comment",
+    "z": "57cb155c8e043b9f",
+    "name": "Sensor de distancia (HC-SR04: Trig GPIO 18, Echo GPIO 23)",
+    "info": "Al iniciar, Node-RED escribe el script en /tmp/sonar_robot.py y lo deja corriendo.\nMide unas 12 veces por segundo, usa la mediana de 3 lecturas y nunca se cuelga.\nImprime la distancia en cm, o -1 si no hay nada en rango (camino libre).",
+    "x": 250,
+    "y": 520,
+    "wires": []
+  },
+  {
+    "id": "x_ini",
+    "type": "inject",
+    "z": "57cb155c8e043b9f",
+    "name": "Iniciar sensor",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "1",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 130,
     "y": 580,
     "wires": [
       [
+        "x_py"
+      ]
+    ]
+  },
+  {
+    "id": "x_py",
+    "type": "template",
+    "z": "57cb155c8e043b9f",
+    "name": "Código del sensor (Python)",
+    "field": "payload",
+    "fieldType": "msg",
+    "format": "python",
+    "syntax": "plain",
+    "template": "import RPi.GPIO as GPIO\nimport time\n\nTRIG, ECHO = 18, 23          # BCM (pines fisicos 12 y 16)\nGPIO.setmode(GPIO.BCM)\nGPIO.setwarnings(False)\nGPIO.setup(TRIG, GPIO.OUT)\nGPIO.setup(ECHO, GPIO.IN)\nGPIO.output(TRIG, False)\ntime.sleep(0.3)\n\ndef medir():\n    GPIO.output(TRIG, True)\n    time.sleep(0.00001)\n    GPIO.output(TRIG, False)\n    limite = time.time() + 0.03          # timeout: nunca se cuelga (~5 m)\n    inicio = time.time()\n    while GPIO.input(ECHO) == 0:\n        inicio = time.time()\n        if inicio > limite:\n            return -1\n    fin = time.time()\n    while GPIO.input(ECHO) == 1:\n        fin = time.time()\n        if fin > limite:\n            return -1\n    return (fin - inicio) * 34300 / 2\n\ntry:\n    while True:\n        # 3 mediciones y la mediana: saca los picos de ruido de los motores\n        v = []\n        for _ in range(3):\n            d = medir()\n            if 2 < d < 400:\n                v.append(d)\n            time.sleep(0.012)\n        v.sort()\n        print(round(v[len(v) // 2], 1) if v else -1, flush=True)\n        time.sleep(0.03)\nfinally:\n    GPIO.cleanup()\n",
+    "output": "str",
+    "x": 330,
+    "y": 580,
+    "wires": [
+      [
+        "x_file"
+      ]
+    ]
+  },
+  {
+    "id": "x_file",
+    "type": "file",
+    "z": "57cb155c8e043b9f",
+    "name": "/tmp/sonar_robot.py",
+    "filename": "/tmp/sonar_robot.py",
+    "filenameType": "str",
+    "appendNewline": false,
+    "createDir": false,
+    "overwriteFile": "true",
+    "encoding": "utf8",
+    "x": 540,
+    "y": 580,
+    "wires": [
+      [
+        "x_exec"
+      ]
+    ]
+  },
+  {
+    "id": "x_exec",
+    "type": "exec",
+    "z": "57cb155c8e043b9f",
+    "command": "python3 -u /tmp/sonar_robot.py",
+    "addpay": "",
+    "append": "",
+    "useSpawn": "true",
+    "timer": "",
+    "winHide": false,
+    "oldrc": false,
+    "name": "Sensor DISTANCIA",
+    "x": 160,
+    "y": 640,
+    "wires": [
+      [
         "d_dist"
-      ]
+      ],
+      [
+        "x_err"
+      ],
+      []
     ]
   },
   {
-    "id": "b9d4dd171e9069d6",
-    "type": "global-config",
-    "env": [],
-    "modules": {
-      "node-red-node-pi-gpiod": "0.5.1",
-      "node-red-node-pisrf": "0.4.0"
-    }
+    "id": "x_err",
+    "type": "debug",
+    "z": "57cb155c8e043b9f",
+    "name": "Errores del sensor",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 390,
+    "y": 680,
+    "wires": []
   },
   {
-    "id": "vision-tab",
-    "type": "tab",
-    "label": "Vision RaspiRobot",
-    "disabled": false,
-    "info": "Recibe por MQTT los resultados JSON de vision.py."
-  },
-  {
-    "id": "vision-broker",
-    "type": "mqtt-broker",
-    "name": "Broker MQTT del robot",
-    "broker": "CAMBIAR_HOST_DEL_BROKER",
-    "port": "1883",
-    "clientid": "",
-    "autoConnect": true,
-    "usetls": false,
-    "protocolVersion": "4",
-    "keepalive": "60",
-    "cleansession": true,
-    "autoUnsubscribe": true,
-    "birthTopic": "",
-    "birthQos": "0",
-    "birthRetain": "false",
-    "birthPayload": "",
-    "closeTopic": "",
-    "closeQos": "0",
-    "closeRetain": "false",
-    "closePayload": "",
-    "willTopic": "",
-    "willQos": "0",
-    "willRetain": "false",
-    "willPayload": ""
-  },
-  {
-    "id": "vision-mqtt-in",
-    "type": "mqtt in",
-    "z": "vision-tab",
-    "name": "Resultados de vision.py",
-    "topic": "robot/vision",
-    "qos": "0",
-    "datatype": "utf8",
-    "broker": "vision-broker",
-    "nl": false,
-    "rap": true,
-    "rh": 0,
-    "inputs": 0,
-    "x": 190,
-    "y": 120,
+    "id": "p_ini",
+    "type": "inject",
+    "z": "57cb155c8e043b9f",
+    "name": "Brillo máximo LEDs",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "2",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 150,
+    "y": 960,
     "wires": [
       [
-        "vision-json"
+        "p_exec"
       ]
     ]
   },
   {
-    "id": "vision-json",
-    "type": "json",
-    "z": "vision-tab",
-    "name": "Decodificar JSON",
-    "property": "payload",
-    "action": "",
-    "pretty": false,
-    "x": 400,
-    "y": 120,
+    "id": "p_exec",
+    "type": "exec",
+    "z": "57cb155c8e043b9f",
+    "command": "pigs pads 0 16",
+    "addpay": "",
+    "append": "",
+    "useSpawn": "false",
+    "timer": "5",
+    "winHide": false,
+    "oldrc": false,
+    "name": "Pines a 16 mA (más brillo)",
+    "x": 380,
+    "y": 960,
     "wires": [
+      [],
       [
-        "vision-store"
-      ]
+        "x_err"
+      ],
+      []
     ]
   },
   {
-    "id": "vision-store",
+    "id": "vision-follow",
     "type": "function",
-    "z": "vision-tab",
-    "name": "Guardar estado de visión",
-    "func": "const p = msg.payload;\nif (!p || typeof p !== \"object\" || typeof p.detectado !== \"boolean\" || typeof p.modo !== \"string\") {\n    node.warn(\"Mensaje de visión inválido; se esperaba un objeto JSON con detectado y modo\");\n    return null;\n}\nconst x = Number.isFinite(p.x) ? Math.max(0, Math.min(1, p.x)) : null;\nconst area = Number.isFinite(p.area) ? Math.max(0, p.area) : null;\nglobal.set(\"robot_vision\", {\n    activo: true,\n    detectado: p.detectado,\n    modo: p.modo,\n    x,\n    area,\n    texto: typeof p.texto === \"string\" ? p.texto : null,\n    recibido: Date.now()\n});\nnode.status({ fill: p.detectado ? \"green\" : \"grey\", shape: \"dot\", text: p.modo + (p.detectado ? \" detectado\" : \" sin objeto\") });\nreturn msg;",
+    "z": "57cb155c8e043b9f",
+    "name": "Seguimiento visual seguro",
+    "func": "const AUTO_SPEED = 45;\nconst AUTO_MAX_STEER = 60;\nconst DEAD_BAND = 0.08;\nconst STREAM_TIMEOUT_MS = 750;\nconst TARGET_TIMEOUT_MS = 500;\n\nconst state = flow.get(\"robot\") || {};\nif (state.auto !== true) return null;\n\nconst vision = global.get(\"robot_vision\");\nconst now = Date.now();\nconst streamFresh = vision && Number.isFinite(vision.recibido) && now - vision.recibido < STREAM_TIMEOUT_MS && vision.mensajes_recientes >= 3;\nconst targetFresh = vision && Number.isFinite(vision.ultimo_detectado) && now - vision.ultimo_detectado < TARGET_TIMEOUT_MS;\nif (!streamFresh || !targetFresh || !Number.isFinite(vision.ultima_x)) {\n    return { payload: { cmd: \"stop\", steer: 0, auto: false, origen: \"vision\" } };\n}\n\nconst error = vision.ultima_x - 0.5;\nlet steer = 0;\nif (Math.abs(error) > DEAD_BAND) {\n    const proporcion = (Math.abs(error) - DEAD_BAND) / (0.5 - DEAD_BAND);\n    steer = Math.round(Math.sign(error) * Math.min(1, proporcion) * AUTO_MAX_STEER);\n}\nreturn { payload: { cmd: \"adelante\", speed: AUTO_SPEED, steer, origen: \"vision\" } };",
     "outputs": 1,
     "timeout": 0,
     "noerr": 0,
     "initialize": "",
     "finalize": "",
     "libs": [],
-    "x": 630,
-    "y": 120,
+    "x": 430,
+    "y": 420,
     "wires": [
       [
-        "vision-debug"
+        "d_ctl"
       ]
     ]
   },
   {
-    "id": "vision-debug",
-    "type": "debug",
-    "z": "vision-tab",
-    "name": "Deteccion recibida",
-    "active": true,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": true,
-    "complete": "payload",
-    "targetType": "msg",
-    "statusVal": "payload.detectado",
-    "statusType": "msg",
-    "x": 850,
-    "y": 120,
+    "id": "vision-follow-watchdog",
+    "type": "inject",
+    "z": "57cb155c8e043b9f",
+    "name": "Revisar señal de visión",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "0.2",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 420,
+    "wires": [
+      [
+        "vision-follow"
+      ]
+    ]
+  },
+  {
+    "id": "vision-follow-out",
+    "type": "link out",
+    "z": "57b332e36ceceea9",
+    "name": "Enviar detección al control",
+    "mode": "link",
+    "links": [
+      "vision-follow-in"
+    ],
+    "x": 900,
+    "y": 420,
     "wires": []
+  },
+  {
+    "id": "vision-follow-in",
+    "type": "link in",
+    "z": "57cb155c8e043b9f",
+    "name": "Recibir detección para seguimiento",
+    "links": [
+      "vision-follow-out"
+    ],
+    "x": 180,
+    "y": 500,
+    "wires": [
+      [
+        "vision-follow"
+      ]
+    ]
   }
 ]

@@ -2,8 +2,9 @@
 
 Proyecto para usar un celular como cámara IP, detectar color, movimiento o
 códigos QR y mostrar el estado de visión en el tablero del RaspiRobot. El flujo
-completo conserva el control del robot y el freno por distancia del SR04; la
-visión solo informa y todavía no controla los motores.
+completo incluye control manual, freno por distancia del SR04, semáforo/buzzer,
+visualización de cámara y un seguimiento automático experimental, optativo y
+apagado por defecto. El seguimiento aún requiere calibración con el robot.
 
 ## Requisitos
 
@@ -12,8 +13,10 @@ visión solo informa y todavía no controla los motores.
   la misma red.
 - Broker MQTT accesible por la Raspberry Pi y por Node-RED (por ejemplo,
   Mosquitto).
-- Node-RED con los módulos `node-red-node-pi-gpiod` y `node-red-node-pisrf`
-  requeridos por los nodos GPIO y SR04 del robot.
+- Node-RED con `@flowfuse/node-red-dashboard` y `node-red-node-pi-gpiod`.
+- Para el sensor ultrasónico del flujo actual: `python3-rpi.gpio`; el nodo de
+  ajuste de corriente de GPIO también ejecuta `pigs pads 0 16` si ese comando
+  está disponible en la instalación de la Pi.
 
 ## Instalar en la Raspberry Pi
 
@@ -22,7 +25,7 @@ La opción recomendada en Raspberry Pi OS es instalar los paquetes del sistema:
 ```bash
 sudo apt update
 sudo apt install python3-opencv python3-paho-mqtt python3-numpy python3-venv \
-  mosquitto mosquitto-clients unzip
+  python3-rpi.gpio mosquitto mosquitto-clients unzip
 ```
 
 Desde la carpeta del proyecto, crear un entorno que pueda usar esos paquetes:
@@ -87,14 +90,14 @@ instalar `opencv-python` con `pip` en la Pi.
    ```bash
    sudo apt update
    sudo apt install python3-opencv python3-paho-mqtt python3-numpy \
-     python3-venv mosquitto mosquitto-clients unzip
+     python3-venv python3-rpi.gpio mosquitto mosquitto-clients unzip
    cd ~/robot-cloud
    python3 -m venv --system-site-packages .venv
    source .venv/bin/activate
    ```
 
-   Los nodos de Node-RED para GPIO/SR04 son dependencias separadas. Confirmá
-   que estén instalados en la Pi antes de probar motores o sensor.
+   Node-RED y sus módulos de Dashboard/GPIO son dependencias separadas;
+   confirmá que estén instalados en la Pi antes de probar el flow completo.
 
 ## Ejecutar
 
@@ -222,8 +225,10 @@ Python.
 ## Integrar con el tablero del robot y probar MQTT
 
 `flows/flow_vision.json` contiene el flujo completo exportado del robot
-(movimiento, tablero web, servo y SR04), una vista en vivo configurable de la
-cámara del celular y el indicador de detección recibido por MQTT. Antes de
+(movimiento, tablero web, servo, SR04, semáforo y buzzer), una vista en vivo
+configurable de la cámara del celular y el indicador de detección recibido por
+MQTT. El export también conserva páginas de Dashboard adicionales que venían
+en el flujo compartido. Antes de
 reemplazar el flujo de Node-RED, exportá una copia de seguridad. Si ya
 importaste flujos anteriores de este proyecto,
 eliminá únicamente sus pestañas `Movimiento robot`, `Robot Dashboard` y
@@ -231,13 +236,20 @@ eliminá únicamente sus pestañas `Movimiento robot`, `Robot Dashboard` y
 evitás dejar controles o rutas HTTP duplicadas. No borres otras pestañas tuyas.
 
 1. Importar `flows/flow_vision.json` desde el menú de Node-RED (Import > select
-   a file). En la configuración `Broker MQTT del robot`, reemplazar
-   `CAMBIAR_HOST_DEL_BROKER` por `localhost`, dado que Mosquitto y Node-RED
-   correrán directamente en la misma Pi. Si Node-RED estuviera en Docker, esta
-   dirección tendría que revisarse porque `localhost` apuntaría al contenedor.
-2. Confirmar que Node-RED tiene los módulos `node-red-node-pi-gpiod` y
-   `node-red-node-pisrf` instalados. Si faltan, instalarlos desde **Menu >
-   Manage palette > Install** y reiniciar Node-RED si lo solicita.
+   a file). El broker de visión del export está configurado como `127.0.0.1`
+   en el puerto `1883`, porque Mosquitto y Node-RED corren en la misma Pi. Si
+   Node-RED estuviera en Docker, esa dirección tendría que revisarse porque
+   `127.0.0.1` apuntaría al contenedor.
+2. Confirmar que Node-RED tiene `@flowfuse/node-red-dashboard` y
+   `node-red-node-pi-gpiod` instalados. Si faltan, instalarlos desde **Menu >
+   Manage palette > Install** y reiniciar Node-RED si lo solicita. El flujo
+   El inject `Iniciar sensor` escribe y ejecuta `/tmp/sonar_robot.py` una vez
+   al iniciar el flujo; ese sensor requiere `python3-rpi.gpio` y permisos GPIO
+   para el usuario que ejecuta Node-RED.
+   Además, el flujo intenta ejecutar `pigs pads 0 16` para ajustar la corriente
+   de los pines; si `pigs` no está instalado o no funciona, revisá el nodo
+   `Errores del sensor` y consultá al responsable de la Pi antes de cambiar
+   permisos o instalar componentes del sistema.
 3. Implementar el flujo y abrir `http://IP_DE_LA_MAQUINA_NODE_RED:1880/robot`.
    En la sección “Cámara en vivo”, ingresá la URL del celular
    (por ejemplo `http://IP_DEL_CELULAR:8080/video`) y presioná “Conectar”. La
@@ -253,9 +265,10 @@ evitás dejar controles o rutas HTTP duplicadas. No borres otras pestañas tuyas
 
 1. En la Pi, verificar Mosquitto y el puerto `1883` siguiendo los pasos
    anteriores.
-2. En Node-RED, exportar una copia de seguridad, importar este flujo, cambiar
-   el broker a `localhost` y hacer Deploy. Confirmar que estén instalados los
-   módulos de Node-RED para GPIO/SR04.
+2. En Node-RED, exportar una copia de seguridad, importar este flujo, comprobar
+   que el broker de visión use `127.0.0.1` y hacer Deploy. Confirmar que estén
+   instalados Dashboard 2 y `node-red-node-pi-gpiod`; verificar también
+   `python3-rpi.gpio` en el sistema de la Pi.
 3. Desde el navegador de un equipo en la misma red, abrir
    `http://IP_DE_LA_PI:1880/robot`. Iniciar la app de cámara del celular,
    ingresar su URL en “Cámara en vivo” y conectar. El navegador debe poder
@@ -266,9 +279,12 @@ evitás dejar controles o rutas HTTP duplicadas. No borres otras pestañas tuyas
    que sigan llegando las detecciones.
 5. Presentar un objeto del color elegido y confirmar en el dashboard el estado
    y la posición. Detener el detector con `Ctrl+C`.
-6. Probar motores y SR04 solo después de comprobar el mapeo de pines y la placa;
-   comenzar con las ruedas levantadas, velocidad baja y una forma inmediata de
-   frenar.
+6. Con el robot sin apoyar en el piso, probar SR04, motores, semáforo y buzzer.
+   Confirmar el sentido de los motores y que el botón STOP los detiene.
+7. Solo después, activar “Seguimiento visual” en un área despejada y con una
+   persona junto al botón STOP. Comprobar izquierda, centro, derecha, pérdida
+   de objeto y bloqueo del SR04; empezar con las ruedas levantadas y bajar el
+   robot al piso solo si el movimiento resulta controlable.
 
 Para observar mensajes desde una terminal adicional:
 
@@ -305,24 +321,37 @@ con demora, revisar carga de CPU de la Pi y reducir `--hz` (por ejemplo
 El indicador de detección marca que no hay señal si no recibe un mensaje en
 3 segundos. El video en vivo se conecta directamente desde el navegador al
 celular y puede seguir viéndose aunque `vision.py` esté detenido. Para
-actualizar detecciones y posición, sí se necesita el script en ejecución. La
-integración no activa conducción automática: los
-comandos del joystick y el freno del SR04 conservan su funcionamiento original.
+actualizar detecciones y posición, sí se necesita el script en ejecución.
 
-### Qué falta para que la visión mueva el robot
+### Seguimiento visual automático (experimental)
 
-Actualmente `vision.py` analiza el video y publica detecciones en `robot/vision`.
-Node-RED valida esos mensajes y los muestra en el dashboard, pero no los conecta
-a los nodos de motores o servo. El control de actuadores sigue siendo manual y
-el SR04 mantiene su freno por distancia.
+El flujo tiene un botón **Activar seguimiento**, apagado al iniciar. Solo se
+habilita si el tablero recibe una detección actual. Al activarlo, el robot
+avanza y orienta el servo hacia la posición horizontal `x` del objeto; el área
+aparente (`area`) no se usa como distancia. La velocidad base es 45 % de PWM;
+el control agrega hasta 9 puntos porcentuales al girar (54 % como máximo).
+La orden de giro se limita a ±60 y luego el control existente la restringe
+además al 40 % del recorrido configurado del servo. Hay una zona muerta entre
+`x=0.42` y `x=0.58` para evitar correcciones pequeñas constantes.
 
-Para agregar seguimiento visual, primero hay que decidir el comportamiento
-(por ejemplo, girar el servo hacia un objeto del color elegido), cómo se activa
-y desactiva el modo automático y qué hacer cuando se pierde la detección.
-Después se integra esa lógica en Node-RED con límites de velocidad, parada
-segura y prioridad del SR04, y se valida con el robot presente. No se debe
-interpretar `area` como una medición de distancia ni mover el robot basándose
-solo en la detección visual.
+El modo se detiene y se desarma si se pierde el objeto por 0,5 s, si la señal
+MQTT lleva 0,75 s sin actualizar o si el SR04 detecta un obstáculo dentro de su
+límite o deja de actualizar durante 1,5 s. El botón **STOP** y cualquier orden
+manual también cancelan el modo. Para volver a seguir, hay que activarlo de
+nuevo cuando el objeto se vea en el tablero.
+
+Esto prepara el comportamiento, pero no reemplaza la calibración física: el
+45 % es el mínimo de marcha definido por el control existente, no una garantía
+de velocidad segura para esta unidad. Probar primero con las ruedas levantadas,
+verificar el sentido real del servo y los motores, y ajustar valores con el
+robot presente. La detección no mide distancia; no usar `area` para decidir si
+el camino está libre.
+
+La lógica y los interlocks se pueden probar sin la Raspberry ni el robot con:
+
+```bash
+node --test tests/vision-follow.test.cjs
+```
 
 ## Orden sugerido de pruebas
 
@@ -332,13 +361,15 @@ solo en la detección visual.
 3. Probar Mosquitto por separado con `mosquitto_sub` y comprobar el tópico.
 4. Importar Node-RED, configurar el broker y confirmar que su Debug recibe los
    mensajes publicados por el script (sin `--sin-mqtt`).
-5. Repetir varias veces y registrar resolución, FPS observados y latencia
+5. Ejecutar `node --test tests/vision-follow.test.cjs` para revisar la lógica de
+   seguimiento e interlocks sin accionar hardware.
+6. Repetir varias veces y registrar resolución, FPS observados y latencia
    aproximada para el informe. El script actual no calcula esas métricas.
-6. Guardar aparte un video de respaldo donde se vea la detección y Node-RED
+7. Guardar aparte un video de respaldo donde se vea la detección y Node-RED
    reaccionando. No se incluye un video porque aún no hay una captura del
    proyecto.
-7. Con el robot presente, confirmar el mapeo de motores y probar primero a
-   velocidad baja; consultar [`docs/pines.md`](docs/pines.md).
+8. Con el robot presente, confirmar el mapeo de motores y probar primero con
+   las ruedas levantadas; consultar [`docs/pines.md`](docs/pines.md).
 
 ## Solución de problemas frecuentes
 
@@ -494,17 +525,22 @@ resolución/calidad o el FPS de la app del celular y probá una red Wi-Fi establ
 ventana local salvo que agregues `--ver`; quitá esa opción para ejecutar sin
 ventana.
 
-### Node-RED muestra nodos GPIO/SR04 desconocidos
+### Node-RED muestra nodos Dashboard/GPIO desconocidos o falla el SR04
 
 En Node-RED abrí **Menu > Manage palette > Install** e instalá
-`node-red-node-pi-gpiod` y `node-red-node-pisrf`; reiniciá Node-RED si lo pide.
+`@flowfuse/node-red-dashboard` y `node-red-node-pi-gpiod`; reiniciá Node-RED si
+lo pide. El SR04 de este export se ejecuta mediante `/tmp/sonar_robot.py`, no
+con un nodo `rpi-srf`: instalá `python3-rpi.gpio` y revisá los errores del nodo
+Exec. Si falla solo el comando `pigs`, comprobá `command -v pigs`; consultá al
+responsable de la Pi antes de instalar/configurar pigpio o modificar permisos.
 Hacé una copia de seguridad del flujo antes de importar o reemplazar pestañas.
 No pruebes motores hasta confirmar que los pines coinciden con la placa real.
 
-La detección de visión solo informa en el dashboard: no manda órdenes a los
-motores. El SR04 y su lógica de freno se mantienen aparte. No guardes
-contraseñas, claves privadas, certificados ni IPs personales en el código o en
-el flujo; revisá los cambios antes de publicar el repo.
+El seguimiento visual está apagado por defecto y solo se activa desde el botón
+del dashboard cuando hay detecciones recientes. El SR04 mantiene prioridad y
+STOP o cualquier orden manual lo cancelan. No guardes contraseñas, claves
+privadas, certificados ni IPs personales en el código o en el flujo; revisá
+los cambios antes de publicar el repo.
 
 ## Actualizar el repositorio público de GitHub
 
@@ -512,9 +548,9 @@ Después de revisar los cambios, subilos desde esta carpeta:
 
 ```bash
 git status
-git add README.md docs/pines.md flows/flow_vision.json
+git add README.md docs/pines.md flows/flow_vision.json tests/vision-follow.test.cjs
 git diff --cached --check
-git commit -m "Integrar estado de camara al flujo del robot"
+git commit -m "Preparar seguimiento visual optativo"
 git push
 ```
 
