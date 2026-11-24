@@ -159,7 +159,7 @@ test("target position steers left and right with a center dead band", () => {
   assert.equal(h.run("vision-follow", { payload: 0 }).payload.steer, 0);
 });
 
-test("missing target beyond the grace period stops and disarms follow", () => {
+test("missing target beyond the grace period stops but keeps follow armed", () => {
   const h = harness({
     robot: { cmd: "adelante", speed: 45, steer: 0, auto: true },
     tLectura: 10000,
@@ -172,9 +172,19 @@ test("missing target beyond the grace period stops and disarms follow", () => {
   h.setTime(10600);
   const result = h.run("vision-follow", { payload: 0 });
   assert.equal(result.payload.cmd, "stop");
-  assert.equal(result.payload.auto, false);
+  assert.equal(result.payload.auto, true);
   h.run("d_ctl", result);
-  assert.equal(h.flowState.get("robot").auto, false);
+  assert.equal(h.flowState.get("robot").cmd, "stop");
+  assert.equal(h.flowState.get("robot").auto, true);
+
+  h.setTime(10700);
+  publishVision(h, true, 0.7);
+  const resumed = h.run("vision-follow", { payload: 0 });
+  assert.equal(resumed.payload.cmd, "adelante");
+  assert.equal(resumed.payload.auto, undefined);
+  h.run("d_ctl", resumed);
+  assert.equal(h.flowState.get("robot").cmd, "adelante");
+  assert.equal(h.flowState.get("robot").auto, true);
 });
 
 test("stale vision stream stops and disarms follow", () => {

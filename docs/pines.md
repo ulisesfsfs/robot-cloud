@@ -68,11 +68,11 @@ la restringe además al 40 % del recorrido configurado del servo. La zona
 muerta es `0.42–0.58`. El 45 % es el mínimo de marcha definido por el control
 existente, no una velocidad segura validada en el robot.
 
-El seguimiento se desarma y detiene ante pérdida de objeto durante 0,5 s,
-silencio MQTT durante 0,75 s o bloqueo/error del HC-SR04. STOP y cualquier
-orden manual también cancelan el modo. No se implementa una acción `BUSCAR`:
-si desaparece el objeto, el robot se detiene y espera a que alguien reactive
-el seguimiento.
+Ante pérdida del objeto durante 0,5 s, el robot se detiene pero el modo queda
+armado y reanuda automáticamente si vuelve a detectarlo. El modo se desarma
+ante silencio MQTT durante 0,75 s o bloqueo/error del HC-SR04. STOP y
+cualquier orden manual también cancelan el modo. No se implementa una acción
+`BUSCAR`: mientras no haya detección, el robot se queda detenido.
 
 Antes de probar movimiento real, verificar el sentido del servo y de los
 motores, probar STOP y el SR04, y empezar con las ruedas levantadas en un área

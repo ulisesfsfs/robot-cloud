@@ -334,11 +334,12 @@ La orden de giro se limita a ±60 y luego el control existente la restringe
 además al 40 % del recorrido configurado del servo. Hay una zona muerta entre
 `x=0.42` y `x=0.58` para evitar correcciones pequeñas constantes.
 
-El modo se detiene y se desarma si se pierde el objeto por 0,5 s, si la señal
-MQTT lleva 0,75 s sin actualizar o si el SR04 detecta un obstáculo dentro de su
-límite o deja de actualizar durante 1,5 s. El botón **STOP** y cualquier orden
-manual también cancelan el modo. Para volver a seguir, hay que activarlo de
-nuevo cuando el objeto se vea en el tablero.
+Al perder el objeto por 0,5 s, el robot se detiene pero el modo permanece
+armado; cuando vuelve a detectarlo, reanuda el seguimiento sin otro toque. El
+modo sí se desarma si la señal MQTT lleva 0,75 s sin actualizar o si el SR04
+detecta un obstáculo dentro de su límite o deja de actualizar durante 1,5 s.
+El botón **STOP** y cualquier orden manual también lo cancelan. Tras esos
+eventos, hay que volver a activarlo manualmente.
 
 Esto prepara el comportamiento, pero no reemplaza la calibración física: el
 45 % es el mínimo de marcha definido por el control existente, no una garantía
