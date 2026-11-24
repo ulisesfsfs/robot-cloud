@@ -112,7 +112,7 @@ conectarse a otra red; confirmalas ese día y no las guardes en el repositorio.
 | Host del broker MQTT | `localhost` si Mosquitto corre en la misma Pi | `--broker` para Python y configuración `Broker MQTT del robot` en Node-RED |
 | Puerto MQTT | Normalmente `1883` | `--puerto` y configuración del broker |
 | Tópico de visión | `robot/vision` | Es el predeterminado del script y el tópico al que se suscribe el flujo |
-| Modo y objetivo | Por ejemplo, modo `color` y color `verde` | Argumentos `--modo` y `--color` |
+| Modo y objetivo | Para detectar los tres colores: modo `color`, color `todos` | Argumentos `--modo color --color todos` |
 | Dirección del dashboard | `http://IP_DE_LA_PI:1880/robot` | Abrir en el navegador; requiere Node-RED en la Pi |
 
 Para la prueba prevista, Mosquitto, Node-RED y `vision.py` corren en la misma
@@ -194,12 +194,15 @@ Iniciá la app de cámara IP en el celular y averiguá la URL de video. Luego:
 
 ```bash
 python vision.py --url http://IP_DEL_CELULAR:PUERTO/video \
-  --modo color --color verde --broker localhost --puerto 1883 \
+  --modo color --color todos --broker localhost --puerto 1883 \
   --topic robot/vision
 ```
 
-El puerto debe coincidir con el configurado en la app. Modos disponibles:
-`color` (`verde`, `azul`, `amarillo`, `rojo`), `movimiento` y `qr`.
+El puerto debe coincidir con el configurado en la app. Con `--color todos`,
+el detector busca verde, rojo y amarillo en cada cuadro; el objeto de mayor
+área se usa como objetivo para el seguimiento y cada color detectado se publica
+para los LEDs. También se puede elegir un color individual (`verde`, `azul`,
+`amarillo` o `rojo`). Otros modos disponibles: `movimiento` y `qr`.
 El script no abre una ventana local por defecto: el video se ve en el dashboard.
 Agregar `--ver` solo si se quiere abrir una vista de diagnóstico en la pantalla
 de la computadora que ejecuta Python. Para probar detección sin MQTT, agregar
@@ -213,7 +216,7 @@ export VISION_URL="http://IP_DEL_CELULAR:PUERTO/video"
 export MQTT_BROKER="localhost"
 export MQTT_PORT=1883
 export MQTT_TOPIC="robot/vision"
-python vision.py --modo color --color verde
+python vision.py --modo color --color todos
 ```
 
 `--url` y `--broker` también pueden pasarse como argumentos y prevalecen sobre
@@ -295,7 +298,7 @@ mosquitto_sub -h 127.0.0.1 -t robot/vision -v
 Cada mensaje es JSON, por ejemplo:
 
 ```json
-{"detectado":true,"x":0.31,"area":0.05,"modo":"color"}
+{"detectado":true,"color":"verde","colores":["verde","amarillo"],"x":0.31,"area":0.05,"modo":"color"}
 ```
 
 `x` es la posición horizontal normalizada (0 izquierda, 0.5 centro, 1 derecha);
@@ -348,10 +351,31 @@ verificar el sentido real del servo y los motores, y ajustar valores con el
 robot presente. La detección no mide distancia; no usar `area` para decidir si
 el camino está libre.
 
+### LEDs según el color detectado
+
+En modo `color`, ejecutar el detector con `--color todos` para detectar verde,
+rojo y amarillo simultáneamente. Se enciende el LED correspondiente a cada
+color presente en la imagen; si hay más de un color, pueden quedar varios LEDs
+encendidos. El objeto de mayor área sigue siendo el objetivo usado por el
+modo de seguimiento. Cuando no se detecta ninguno, los LEDs vuelven a mostrar
+el estado habitual del robot. El semáforo del dashboard refleja las mismas
+luces y muestra “Detectado: ...” mientras indica colores. Para evitar que un
+cuadro sin detección apague la luz entre mensajes, mantiene el último color
+positivo hasta 0,75 segundos.
+
+La indicación de seguridad tiene prioridad: si hay un obstáculo en la zona de
+freno o el HC-SR04 deja de actualizar, se muestra rojo y suena el buzzer,
+independientemente de los colores detectados. La luz roja de un objeto
+detectado por sí sola no activa el buzzer. Si el dashboard dice “HC-SR04 sin
+datos”, revisar el sensor y el nodo `Distancia y freno`; el rojo de seguridad
+está ocultando intencionalmente los colores hasta que el sensor vuelva a
+actualizar. Esta función reutiliza los LEDs del semáforo existente.
+
 La lógica y los interlocks se pueden probar sin la Raspberry ni el robot con:
 
 ```bash
 node --test tests/vision-follow.test.cjs
+python -m unittest discover -s tests -p 'test_vision_colors.py'
 ```
 
 ## Orden sugerido de pruebas

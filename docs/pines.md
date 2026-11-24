@@ -18,9 +18,9 @@ GPIO de la Raspberry Pi: deben ir al controlador de motores correspondiente.
 | Servo de dirección | 2 | Control manual |
 | HC-SR04 Trigger | 18 | Script `RPi.GPIO` generado por Node-RED |
 | HC-SR04 Echo | 23 | Script `RPi.GPIO` generado por Node-RED |
-| LED rojo | 11 | Semáforo de proximidad |
-| LED amarillo | 22 | Marcha atrás |
-| LED verde | 9 | Camino libre |
+| LED rojo | 11 | Semáforo de proximidad / color rojo detectado |
+| LED amarillo | 22 | Marcha atrás / color amarillo detectado |
+| LED verde | 9 | Camino libre / color verde detectado |
 | Buzzer pasivo | 15 | Aviso junto al LED rojo |
 
 El HC-SR04 suele emitir 5 V en Echo, mientras que los GPIO de la Pi son de
@@ -46,7 +46,7 @@ que el ajuste de pines se aplicó.
 Ejemplo de detección:
 
 ```json
-{"detectado":true,"x":0.31,"area":0.05,"modo":"color"}
+{"detectado":true,"color":"verde","colores":["verde","amarillo"],"x":0.31,"area":0.05,"modo":"color"}
 ```
 
 El publicador emite también mensajes con `"detectado": false` cuando no encuentra
@@ -58,6 +58,18 @@ con una dirección alcanzable desde su proceso o contenedor.
 La entrada MQTT actualiza el estado de visión y alimenta el modo opcional
 **Seguimiento visual** del dashboard. El modo está apagado al iniciar y no usa
 `area` para calcular distancia.
+
+Para detectar los tres colores a la vez, ejecutar `vision.py` con
+`--modo color --color todos`. Node-RED enciende los LEDs correspondientes a
+todos los colores detectados; el objeto de mayor área se conserva como objetivo
+del seguimiento. El último color positivo se mantiene hasta 0,75 s para evitar
+parpadeos entre cuadros. Si no se detecta un color, los LEDs vuelven a indicar el
+estado normal del robot. La indicación de seguridad del semáforo (obstáculo o
+falta de actualización del HC-SR04) tiene prioridad y muestra rojo con buzzer;
+detectar un objeto rojo por sí solo no activa el buzzer. El semáforo del
+dashboard refleja las luces físicas e indica “Detectado: ...” o el motivo de
+la alerta; “HC-SR04 sin datos” significa que primero hay que revisar el sensor
+o su nodo de lectura.
 
 ## Seguimiento visual automático (experimental)
 
