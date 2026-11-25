@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import sys
+import threading
 import time
 
 import cv2
@@ -107,6 +108,40 @@ def detectar_qr(frame, detector):
             "_caja": (int(xs.min()), int(ys.min()), int(bw), int(bh))}
 
 
+class LectorUltimoCuadro:
+    """Lee el video en un hilo aparte y se queda solo con el cuadro mas nuevo.
+
+    Sin esto, si la Raspberry analiza mas lento de lo que llega el video,
+    los cuadros se acumulan y la deteccion va cada vez mas atrasada (segundos).
+    """
+
+    def __init__(self, url):
+        self.url = url
+        self.cuadro = None
+        self.numero = 0
+        self.lock = threading.Lock()
+        threading.Thread(target=self._leer, daemon=True).start()
+
+    def _leer(self):
+        cap = cv2.VideoCapture(self.url)
+        while True:
+            ok, frame = cap.read()
+            if not ok:
+                print("Sin imagen. Reintentando...", file=sys.stderr)
+                cap.release(); time.sleep(1); cap = cv2.VideoCapture(self.url)
+                continue
+            with self.lock:
+                self.cuadro = frame
+                self.numero += 1
+
+    def ultimo(self, despues_de):
+        """Devuelve (numero, cuadro) si hay uno mas nuevo que 'despues_de'."""
+        with self.lock:
+            if self.cuadro is None or self.numero == despues_de:
+                return despues_de, None
+            return self.numero, self.cuadro
+
+
 def crear_cliente_mqtt(host, port):
     import paho.mqtt.client as mqtt
     try:                                   # paho-mqtt 2.x
@@ -146,15 +181,14 @@ def main():
     qr = cv2.QRCodeDetector() if a.modo == "qr" else None
     gris_prev, ultimo_envio = None, 0.0
 
-    cap = cv2.VideoCapture(a.url)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)     # menos retraso (no todos los backends lo respetan)
+    lector = LectorUltimoCuadro(a.url)      # siempre analiza el cuadro mas nuevo (sin retraso acumulado)
+    visto = 0
     print(f"Modo: {a.modo} | Fuente: {a.url} | MQTT: {'no' if cli is None else a.broker + '/' + a.topic}")
 
     while True:
-        ok, frame = cap.read()
-        if not ok:
-            print("Sin imagen. Reintentando...", file=sys.stderr)
-            cap.release(); time.sleep(1); cap = cv2.VideoCapture(a.url)
+        visto, frame = lector.ultimo(visto)
+        if frame is None:
+            time.sleep(0.005)
             continue
         frame = cv2.resize(frame, (320, 240))      # chico = mas rapido en la Raspberry
 
@@ -191,7 +225,6 @@ def main():
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
-    cap.release()
     if a.ver:
         cv2.destroyAllWindows()
 
