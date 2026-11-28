@@ -5,7 +5,7 @@ movimiento o códigos QR y envía los resultados por MQTT a Node-RED. El flujo
 también ofrece control manual, lectura del sensor ultrasónico, luces, buzzer y
 seguimiento visual experimental.
 
-![RaspiRobot con el celular usado como cámara](docs/images/raspirobot.jpg)
+<img src="docs/images/raspirobot.jpg" alt="RaspiRobot con el celular usado como cámara" width="320">
 
 ## Qué necesitás
 
